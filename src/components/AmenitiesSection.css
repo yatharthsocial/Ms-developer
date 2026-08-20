@@ -1,0 +1,237 @@
+.amenities-section {
+  position: relative;
+  z-index: 1;
+  background: #f6f5f3;
+}
+
+.amenities-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 6vw, 5rem);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.amenities-header {
+  max-width: 40rem;
+  margin: 0 auto clamp(1.5rem, 3vw, 2.25rem);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.amenities-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b5a2c7;
+  margin-bottom: 0.85rem;
+}
+
+.amenities-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b5a2c7;
+}
+
+.amenities-header h2 {
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: #16131a;
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.01em;
+}
+
+.amenities-header p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #5a5560;
+  margin: 0;
+}
+
+.amenities-layout {
+  max-width: 78rem;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: stretch;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  flex: 1;
+  min-height: 0;
+}
+
+.amenities-image-wrapper {
+  position: relative;
+  height: 100%;
+  min-height: 20rem;
+}
+
+.amenities-image-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(22, 19, 26, 0.12);
+}
+
+.amenities-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.amenities-video.is-front {
+  opacity: 1;
+}
+
+.amenities-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(22, 19, 26, 0) 55%, rgba(22, 19, 26, 0.65) 100%);
+}
+
+.amenities-image-caption {
+  position: absolute;
+  left: 1.75rem;
+  bottom: 1.75rem;
+  color: #fff;
+}
+
+.amenities-image-caption-label {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.amenities-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+.amenity-row-wrapper {
+  border-bottom: 1px solid rgba(22, 19, 26, 0.1);
+}
+
+.amenity-row-wrapper:first-child {
+  border-top: 1px solid rgba(22, 19, 26, 0.1);
+}
+
+.amenity-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.15rem 0.75rem;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.amenity-row:hover,
+.amenity-row.is-active {
+  background: rgba(181, 162, 199, 0.1);
+  border-left-color: #b5a2c7;
+}
+
+.amenity-row:focus-visible {
+  outline: 2px solid rgba(181, 162, 199, 0.6);
+  outline-offset: 2px;
+}
+
+.amenity-row-index {
+  flex-shrink: 0;
+  width: 2rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(22, 19, 26, 0.25);
+}
+
+.amenity-icon {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(181, 162, 199, 0.14);
+  color: #b5a2c7;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.amenity-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.amenity-row:hover .amenity-icon,
+.amenity-row.is-active .amenity-icon {
+  background: #b5a2c7;
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.amenity-icon-pop {
+  animation: amenity-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes amenity-pop {
+  0% {
+    transform: scale(0.4) rotate(-8deg);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.12) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.amenity-row-text h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16131a;
+  margin: 0 0 0.25rem;
+}
+
+.amenity-row-text p {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #6b6572;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .amenities-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .amenities-image-wrapper {
+    min-height: 14rem;
+  }
+
+  .amenity-row {
+    padding: 0.8rem 0.5rem;
+  }
+}

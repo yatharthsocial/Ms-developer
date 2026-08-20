@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Unused/duplicate source assets (superseded by renamed copies actually used in src/)
+src/assets/Elevator.mp4
+src/assets/Terrace.mp4
+src/assets/Pool.mp4
+src/assets/Maid_Room.mp4
+src/assets/herosections.mp4
+src/assets/villa-2.png
+src/assets/image01.png
+src/assets/about-villa.jpg
+src/assets/about-detail.jpg
+src/assets/about-accent.jpg
