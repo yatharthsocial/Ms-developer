@@ -1,0 +1,370 @@
+.gallery-section {
+  position: relative;
+  z-index: 2;
+  background: #f6f5f3;
+  padding: 0 clamp(1.5rem, 6vw, 5rem) clamp(3.5rem, 8vw, 6.5rem);
+  box-sizing: border-box;
+  /* No overflow-x here: it auto-promotes overflow-y to `auto` per spec,
+     which would turn this into a scroll container and break the sticky
+     intro pin below (see AmenitiesSection.css for the same note). */
+}
+
+.gallery-intro-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Bottom-aligned rather than dead-center: the heading still holds one
+     exact spot for the whole slide-in (zero vertical motion — see
+     GallerySection.jsx), just lower in the frame, so there's far less
+     empty space to close before the grid appears right under it. */
+  justify-content: flex-end;
+  padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  box-sizing: border-box;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.gallery-header {
+  max-width: 40rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.gallery-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b5a2c7;
+  margin-bottom: 0.85rem;
+}
+
+.gallery-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b5a2c7;
+}
+
+.gallery-header h2 {
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: #16131a;
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.01em;
+}
+
+.gallery-header p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #5a5560;
+  margin: 0;
+}
+
+/* Bento grid */
+
+.gallery-grid {
+  max-width: 78rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: clamp(9rem, 14vw, 13rem);
+  gap: clamp(0.6rem, 1.4vw, 1rem);
+}
+
+.gallery-item--hero {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.gallery-item--wide {
+  grid-column: span 2;
+}
+
+.gallery-item--tall {
+  grid-row: span 2;
+}
+
+.gallery-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #e5e2e8;
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 1px 0 rgba(22, 19, 26, 0.03);
+  transition: box-shadow 0.35s ease;
+  /* opacity/transform are set inline every scroll frame (see the reveal
+     effect in GallerySection.jsx) — continuous with the heading's own
+     scroll-linked motion above it, rather than a separately time-triggered
+     fade-in, so the whole heading+grid reads as one connected movement. */
+  will-change: opacity, transform;
+}
+
+.gallery-item:hover,
+.gallery-item:focus-visible {
+  box-shadow: 0 24px 48px rgba(22, 19, 26, 0.22);
+  outline: none;
+}
+
+.gallery-item img,
+.gallery-item video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.04);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gallery-item:hover img,
+.gallery-item:focus-visible img,
+.gallery-item:hover video,
+.gallery-item:focus-visible video {
+  transform: scale(1.14);
+}
+
+.gallery-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(22, 19, 26, 0) 45%, rgba(22, 19, 26, 0.75) 100%);
+  opacity: 0.75;
+  transition: opacity 0.4s ease;
+}
+
+.gallery-item:hover .gallery-item-overlay,
+.gallery-item:focus-visible .gallery-item-overlay {
+  opacity: 0.9;
+}
+
+.gallery-item-index {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.95rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Expand affordance on each video tile — click opens it fullscreen with
+   sound. Hover-revealed, matching the rest of the site's card icons. */
+.gallery-item-expand {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(22, 19, 26, 0.35);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.7) rotate(-25deg);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+}
+
+.gallery-item-expand svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.gallery-item:hover .gallery-item-expand,
+.gallery-item:focus-visible .gallery-item-expand {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  background: rgba(181, 162, 199, 0.9);
+}
+
+.gallery-item-caption {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  color: #fff;
+  transform: translateY(0.6rem);
+  opacity: 0.9;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+.gallery-item:hover .gallery-item-caption,
+.gallery-item:focus-visible .gallery-item-caption {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.gallery-item-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #d9cbe6;
+}
+
+.gallery-item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.gallery-item--hero .gallery-item-name {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 860px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: clamp(9rem, 34vw, 12rem);
+  }
+
+  .gallery-item--hero {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .gallery-item--wide {
+    grid-column: span 2;
+  }
+
+  .gallery-item--tall {
+    grid-row: span 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 15rem;
+  }
+
+  .gallery-item--hero,
+  .gallery-item--wide {
+    grid-column: span 1;
+  }
+
+  .gallery-item--tall {
+    grid-row: span 1;
+  }
+}
+
+/* Fullscreen video lightbox */
+
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 9, 12, 0.94);
+  backdrop-filter: blur(10px);
+  padding: clamp(1rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+  animation: gallery-lightbox-in 0.3s ease;
+}
+
+@keyframes gallery-lightbox-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gallery-lightbox-close {
+  position: absolute;
+  top: clamp(1rem, 3vw, 1.75rem);
+  right: clamp(1rem, 3vw, 1.75rem);
+  z-index: 1;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gallery-lightbox-close:hover {
+  background: #b5a2c7;
+  color: #16131a;
+  transform: rotate(90deg);
+}
+
+.gallery-lightbox-frame {
+  position: relative;
+  width: 100%;
+  max-width: 64rem;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: gallery-frame-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes gallery-frame-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gallery-lightbox-frame video {
+  width: 100%;
+  max-height: calc(88vh - 3.5rem);
+  border-radius: 14px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+  background: #000;
+}
+
+.gallery-lightbox-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  color: #fff;
+  text-align: center;
+}
+
+.gallery-lightbox-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b5a2c7;
+}
+
+.gallery-lightbox-name {
+  font-size: 1rem;
+  font-weight: 700;
+}

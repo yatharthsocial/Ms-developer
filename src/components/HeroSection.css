@@ -44,15 +44,18 @@
   justify-content: space-between;
   padding: 0.75rem clamp(1.5rem, 4vw, 3rem) 1rem;
   color: #fff;
+  /* A stationary pop (fade + scale) rather than a directional slide — the
+     content grows into place from where it already sits, it doesn't
+     travel in from below. */
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.97);
+  transition: opacity 2.6s cubic-bezier(0.22, 1, 0.36, 1), transform 2.6s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
 .hero-content.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: scale(1);
   pointer-events: auto;
 }
 

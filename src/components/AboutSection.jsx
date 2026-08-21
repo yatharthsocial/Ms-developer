@@ -13,8 +13,8 @@ const COUNT_DURATION_UP = 1000
 const COUNT_DURATION_DOWN = 650
 
 const stats = [
-  { value: 10, suffix: '+', label: 'Projects Delivered' },
-  { value: 5, suffix: '+', label: 'Years Experience' },
+  { value: 2, suffix: '', label: 'Villas Delivered' },
+  { value: 3, suffix: '+', label: 'Years Experience' },
   { value: 100, suffix: '%', label: 'Happy Clients' },
 ]
 

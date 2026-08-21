@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import villaCard1 from '../assets/villa-card-1.jpg'
 import villaCard2 from '../assets/villa-card-2.jpg'
 import villaCard3 from '../assets/villa-card-3.jpg'
+import villaBrochure1 from '../assets/vila-1.pdf'
+import villaBrochure2 from '../assets/vila-2.pdf'
+import villaBrochure3 from '../assets/villa-3.pdf'
 import EnquiryModal from './EnquiryModal'
 import './VillasSection.css'
 
@@ -17,6 +20,8 @@ const villas = [
     area: '3,800 sq.ft',
     image: villaCard1,
     cta: 'Explore Villa',
+    brochure: villaBrochure1,
+    brochureName: 'vila-1.pdf',
   },
   {
     id: '02',
@@ -30,6 +35,8 @@ const villas = [
     area: '4,200 sq.ft',
     image: villaCard2,
     cta: 'View Progress',
+    brochure: villaBrochure2,
+    brochureName: 'vila-2.pdf',
   },
   {
     id: '03',
@@ -42,6 +49,8 @@ const villas = [
     area: '4,600 sq.ft',
     image: villaCard3,
     cta: 'Register Interest',
+    brochure: villaBrochure3,
+    brochureName: 'villa-3.pdf',
   },
 ]
 

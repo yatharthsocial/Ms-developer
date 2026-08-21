@@ -2,6 +2,10 @@
   position: relative;
   z-index: 1;
   background: #f6f5f3;
+  /* No overflow-x here: it auto-promotes overflow-y to `auto` per spec,
+     which would turn this into a scroll container and break the sticky
+     pin below. Transforms don't add to scrollable overflow anyway, so
+     there's nothing to clip. */
 }
 
 .amenities-pin {
@@ -13,7 +17,8 @@
   justify-content: center;
   padding: clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 6vw, 5rem);
   box-sizing: border-box;
-  overflow-y: auto;
+  overflow: hidden;
+  will-change: transform, opacity;
 }
 
 .amenities-header {

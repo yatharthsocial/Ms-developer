@@ -1,9 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import elevatorVideo from '../assets/amenity-elevator.mp4'
 import terraceVideo from '../assets/amenity-terrace.mp4'
 import poolVideo from '../assets/amenity-pool.mp4'
-import maidRoomVideo from '../assets/amenity-maid-room.mp4'
+import loungeVideo from '../assets/amenity-lounge.mp4'
 import './AmenitiesSection.css'
+
+const VH_PER_AMENITY = 78
+// Lounge (the last amenity) gets extra dwell room of its own: it shows
+// normally for SETTLE_VH, then — still fully pinned, zero vertical motion —
+// spends SLIDE_VH sliding the whole panel out to the left, finishing right
+// as it unpins and hands off to Gallery scrolling up normally underneath.
+const SETTLE_VH = 28
+const SLIDE_VH = 90
+const LAST_ITEM_VH = SETTLE_VH + SLIDE_VH
+
+function easeInOutCubic(x) {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
+}
 
 const amenities = [
   {
@@ -51,21 +64,29 @@ const amenities = [
   },
   {
     id: '04',
-    name: 'Separate Maid Room',
-    description: 'A private, self-contained room for household staff.',
-    video: maidRoomVideo,
+    name: 'Lounge',
+    description: 'A relaxed indoor lounge space designed for everyday comfort.',
+    video: loungeVideo,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 19V9l9-5 9 5v10" />
-        <path d="M3 19h18" />
-        <rect x="7" y="12" width="5" height="7" />
+        <path d="M4 18v-4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4" />
+        <path d="M4 18v2" />
+        <path d="M20 18v2" />
+        <path d="M4 14v-3a2 2 0 0 1 2-2h1" />
+        <path d="M20 14v-3a2 2 0 0 1-2-2h-1" />
+        <path d="M2 18h20" />
       </svg>
     ),
   },
 ]
 
+const lastIndex = amenities.length - 1
+const regularTotalVh = lastIndex * VH_PER_AMENITY
+const totalDwellVh = regularTotalVh + LAST_ITEM_VH
+
 function AmenitiesSection() {
   const pinContainerRef = useRef(null)
+  const pinRef = useRef(null)
   const rowRefs = useRef([])
   const poppedRef = useRef([])
 
@@ -73,7 +94,12 @@ function AmenitiesSection() {
   const [frontLayer, setFrontLayer] = useState('a')
   const videoARef = useRef(null)
   const videoBRef = useRef(null)
+  const frontLayerRef = useRef('a')
   const layerSrcRef = useRef({ a: amenities[0].video, b: null })
+  // Whether each layer's current src has actually fired 'canplay' yet —
+  // lets a later swap be instant instead of re-waiting on a load that's
+  // already in flight.
+  const layerReadyRef = useRef({ a: true, b: false })
 
   const hoveringRef = useRef(false)
   const activeIndexRef = useRef(0)
@@ -83,30 +109,89 @@ function AmenitiesSection() {
   }, [activeIndex])
 
   useEffect(() => {
-    const backLayer = frontLayer === 'a' ? 'b' : 'a'
-    const backRef = backLayer === 'a' ? videoARef : videoBRef
-    const video = backRef.current
+    frontLayerRef.current = frontLayer
+  }, [frontLayer])
+
+  // Starts loading `index`'s clip into whichever layer is currently the
+  // *back* one, well before it's actually needed — so the actual crossfade
+  // in goToIndex can be instant instead of visibly waiting on a fresh
+  // video load, which is what made switching feel laggy before. Reads
+  // frontLayerRef, so this must only ever run when that ref is known to be
+  // up to date (i.e. not in the same tick as a swap that hasn't finished
+  // updating it yet — see the comment in goToIndex below).
+  const preloadIndex = useCallback((index) => {
+    if (index < 0 || index > lastIndex) return
+    const targetSrc = amenities[index].video
+    const front = frontLayerRef.current
+    if (layerSrcRef.current[front] === targetSrc) return
+
+    const back = front === 'a' ? 'b' : 'a'
+    if (layerSrcRef.current[back] === targetSrc) return
+
+    const video = (back === 'a' ? videoARef : videoBRef).current
     if (!video) return
 
-    const targetSrc = amenities[activeIndex].video
-    if (layerSrcRef.current[backLayer] === targetSrc) return
-
-    layerSrcRef.current[backLayer] = targetSrc
+    layerSrcRef.current[back] = targetSrc
+    layerReadyRef.current[back] = false
     video.src = targetSrc
     video.load()
+    video.addEventListener(
+      'canplay',
+      () => {
+        layerReadyRef.current[back] = true
+      },
+      { once: true }
+    )
+  }, [])
 
-    const handleCanPlay = () => {
-      video.play().catch(() => {})
-      setFrontLayer(backLayer)
-    }
+  // Updates which row/caption is active and crossfades its video in — if
+  // it was already preloaded and ready, this swaps immediately; otherwise
+  // it falls back to loading it right now (e.g. scrolling faster than the
+  // predictive lead time can keep up). Only once the swap has *actually*
+  // landed (frontLayerRef updated) does it kick off preloading the next
+  // one — doing that any earlier would race preloadIndex's own read of
+  // frontLayerRef against this swap and clobber the very layer mid-swap.
+  const goToIndex = useCallback(
+    (index) => {
+      setActiveIndex(index)
 
-    video.addEventListener('canplay', handleCanPlay, { once: true })
-    return () => video.removeEventListener('canplay', handleCanPlay)
-  }, [activeIndex])
+      const targetSrc = amenities[index].video
+      const front = frontLayerRef.current
+      if (layerSrcRef.current[front] === targetSrc) {
+        preloadIndex(index + 1)
+        return
+      }
+
+      const back = front === 'a' ? 'b' : 'a'
+      const video = (back === 'a' ? videoARef : videoBRef).current
+      if (!video) return
+
+      const swap = () => {
+        video.play().catch(() => {})
+        frontLayerRef.current = back
+        setFrontLayer(back)
+        preloadIndex(index + 1)
+      }
+
+      if (layerSrcRef.current[back] === targetSrc) {
+        if (layerReadyRef.current[back]) swap()
+        else video.addEventListener('canplay', swap, { once: true })
+        return
+      }
+
+      layerSrcRef.current[back] = targetSrc
+      layerReadyRef.current[back] = false
+      video.src = targetSrc
+      video.load()
+      video.addEventListener('canplay', swap, { once: true })
+    },
+    [preloadIndex]
+  )
 
   useEffect(() => {
     videoARef.current?.play().catch(() => {})
-  }, [])
+    preloadIndex(1)
+  }, [preloadIndex])
 
   useEffect(() => {
     const pinContainer = pinContainerRef.current
@@ -117,22 +202,39 @@ function AmenitiesSection() {
     const updateProgress = () => {
       const rect = pinContainer.getBoundingClientRect()
       const viewportHeight = window.innerHeight
-      const scrollable = rect.height - viewportHeight
-
+      const vhPx = viewportHeight / 100
       const scrolled = -rect.top
-      const progress = scrollable > 0 ? Math.min(Math.max(scrolled / scrollable, 0), 1) : 0
 
-      const rawIndex = Math.floor(progress * amenities.length)
-      const nextIndex = Math.min(amenities.length - 1, Math.max(0, rawIndex))
+      const nextIndex = Math.min(
+        lastIndex,
+        Math.max(0, Math.floor(scrolled / vhPx / VH_PER_AMENITY))
+      )
 
       if (!hoveringRef.current && nextIndex !== activeIndexRef.current) {
-        setActiveIndex(nextIndex)
+        goToIndex(nextIndex)
       }
 
       if (!poppedRef.current[nextIndex]) {
         poppedRef.current[nextIndex] = true
         const icon = rowRefs.current[nextIndex]?.querySelector('.amenity-icon')
         if (icon) icon.classList.add('amenity-icon-pop')
+      }
+
+      // Once Lounge is active, it first shows in place for SETTLE_VH, then —
+      // still fully pinned, zero vertical motion — spends SLIDE_VH sliding
+      // the whole panel out to the left, finishing right as it unpins.
+      let exitProgress = 0
+      const scrolledVh = scrolled / vhPx
+      if (nextIndex === lastIndex) {
+        const localVh = scrolledVh - regularTotalVh
+        exitProgress = Math.min(Math.max((localVh - SETTLE_VH) / SLIDE_VH, 0), 1)
+      }
+
+      const eased = easeInOutCubic(exitProgress)
+
+      if (pinRef.current) {
+        pinRef.current.style.transform = `translateX(${-eased * 100}%)`
+        pinRef.current.style.pointerEvents = exitProgress > 0.05 ? 'none' : 'auto'
       }
 
       ticking = false
@@ -148,16 +250,20 @@ function AmenitiesSection() {
     updateProgress()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [goToIndex])
 
   return (
     <section
       className="amenities-section"
       id="amenities"
       ref={pinContainerRef}
-      style={{ height: `${amenities.length * 100}vh` }}
+      // +100vh: a sticky element of height 100vh only stays glued at top:0
+      // for (wrapperHeight - 100vh) of scroll — without that extra 100vh
+      // here, the panel would unstick (and start moving normally with the
+      // page) 100vh before the exit slide actually finishes.
+      style={{ height: `${totalDwellVh + 100}vh` }}
     >
-      <div className="amenities-pin">
+      <div className="amenities-pin" ref={pinRef}>
         <div className="amenities-header">
           <span className="amenities-eyebrow">
             <span className="amenities-eyebrow-dot" />
@@ -203,12 +309,12 @@ function AmenitiesSection() {
                   ref={(el) => (rowRefs.current[i] = el)}
                   onMouseEnter={() => {
                     hoveringRef.current = true
-                    setActiveIndex(i)
+                    goToIndex(i)
                   }}
                   onMouseLeave={() => {
                     hoveringRef.current = false
                   }}
-                  onFocus={() => setActiveIndex(i)}
+                  onFocus={() => goToIndex(i)}
                   tabIndex={0}
                 >
                   <span className="amenity-row-index">{item.id}</span>

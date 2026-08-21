@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import heroVideo from '../assets/Creating_luxury_villa_commercial_202608191618.mp4'
+import heroVideo from '../assets/hero-video-trimmed.mp4'
 import logo from '../assets/logo.jpg'
 import './HeroSection.css'
 
@@ -19,13 +19,16 @@ function HeroSection() {
     video.play().catch(() => {})
   }, [])
 
+  // Content (nav, headline, CTAs) stays hidden until the intro video
+  // reaches its actual last frame, then pops in smoothly over it — see the
+  // slow scale/opacity transition on .hero-content in HeroSection.css.
   const handleEnded = (e) => {
     e.currentTarget.pause()
     setShowOverlay(true)
   }
 
   return (
-    <section className="hero-section">
+    <section className="hero-section" id="home">
       <video
         ref={videoRef}
         className={`hero-video ${isLoaded ? 'is-loaded' : ''}`}
@@ -44,10 +47,11 @@ function HeroSection() {
           <img src={logo} alt="MS Developers" className="hero-nav-logo" />
           <ul className="hero-nav-links">
             <li><a href="#home">Home</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#process">Process</a></li>
             <li><a href="#about">About Us</a></li>
-            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#villas">Projects</a></li>
+            <li><a href="#amenities">Amenities</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#contact">Contact Us</a></li>
           </ul>
           <div className="hero-nav-cta">
             <a href="#contact" className="hero-btn">Get In Touch</a>
@@ -68,11 +72,11 @@ function HeroSection() {
         <div className="hero-stats">
           <ul className="hero-stats-list">
             <li>
-              <strong>10+</strong>
-              <span>Projects Delivered</span>
+              <strong>2</strong>
+              <span>Villas Delivered</span>
             </li>
             <li>
-              <strong>5+</strong>
+              <strong>3+</strong>
               <span>Years Experience</span>
             </li>
             <li>

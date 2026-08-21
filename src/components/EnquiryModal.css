@@ -25,13 +25,14 @@
   width: 100%;
   max-width: 27rem;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   background: #f6f5f3;
   border-radius: 22px;
-  padding: 2.25rem;
   box-sizing: border-box;
   box-shadow: 0 32px 80px rgba(22, 19, 26, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
   animation: enquiry-pop-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes enquiry-pop-in {
@@ -96,7 +97,26 @@
 .enquiry-form {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.enquiry-scroll {
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 2.25rem 2.25rem 0;
+}
+
+.enquiry-fields {
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
+}
+
+.enquiry-footer {
+  flex-shrink: 0;
+  padding: 1rem 2.25rem 2.25rem;
 }
 
 .enquiry-field {
@@ -177,7 +197,7 @@
 }
 
 .enquiry-btn {
-  margin-top: 0.4rem;
+  width: 100%;
   padding: 0.85rem 1.2rem;
   font-size: 0.85rem;
   font-weight: 600;
@@ -214,7 +234,10 @@
 
 .enquiry-success {
   text-align: center;
-  padding: 1.5rem 0 0.5rem;
+  padding: 2.25rem 2.25rem 2rem;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
 }
 
 .enquiry-success-icon {
