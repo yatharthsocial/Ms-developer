@@ -4,7 +4,16 @@
   left: 0;
   z-index: 0;
   width: 100%;
+  /* 100vh on mobile is measured against the LARGEST possible viewport
+     (address bar collapsed), which is taller than what's actually
+     visible when the bar is showing — it was pushing "Get A
+     Consultation" at the bottom below the real fold, needing a scroll
+     that shouldn't have been necessary. 100svh (small viewport height)
+     is pinned to the viewport as it looks with browser UI visible, i.e.
+     what's actually on screen; 100vh stays as the fallback for the
+     handful of browsers that don't support svh yet. */
   height: 100vh;
+  height: 100svh;
   overflow: hidden;
   background: #000;
 }
@@ -50,6 +59,7 @@
   opacity: 0;
   transform: scale(0.97);
   transition: opacity 2.6s cubic-bezier(0.22, 1, 0.36, 1), transform 2.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
   pointer-events: none;
 }
 
@@ -67,6 +77,12 @@
 }
 
 .hero-nav-logo {
+  /* Pinned to column 1 explicitly — without this, hiding .hero-nav-links
+     on mobile (display: none) removes it as a grid item entirely, so
+     auto-placement slides .hero-nav-cta into the now-empty middle
+     ("auto") column instead of the right ("1fr") one, which is what was
+     actually causing the logo/button to look misaligned. */
+  grid-column: 1;
   width: 108px;
   height: 108px;
   aspect-ratio: 1 / 1;
@@ -103,6 +119,10 @@
 }
 
 .hero-nav-cta {
+  /* Same reasoning as .hero-nav-logo above: pin to column 3 explicitly so
+     it stays on the right regardless of whether the middle column is
+     occupied. */
+  grid-column: 3;
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -196,12 +216,131 @@
 }
 
 @media (max-width: 720px) {
+  .hero-content {
+    /* A bit more room top and bottom on phones — the tight desktop
+       padding left the nav row and stats row feeling cramped against the
+       screen edges. */
+    padding: 1.1rem clamp(1.25rem, 5vw, 2rem) 1.5rem;
+  }
+
+  .hero-nav {
+    gap: 1rem;
+  }
+
   .hero-nav-links {
     display: none;
   }
 
+  .hero-nav-logo {
+    /* 108px (the desktop size) was oversized next to a small button on a
+       narrow screen — that scale mismatch is what read as "not aligned",
+       even though both sit on the same centered row. */
+    width: 60px;
+    height: 60px;
+  }
+
+  .hero-headline h1 {
+    font-weight: 700;
+    /* Bolding needs a touch more room to read cleanly rather than
+       merging into a denser block of text. */
+    line-height: 1.22;
+  }
+
   .hero-stats {
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .hero-stats-list {
+    justify-content: space-between;
+  }
+
+  .hero-stats-list li {
+    padding-right: 0.75rem;
+  }
+
+  .hero-stats-list li + li {
+    padding-left: 0.75rem;
+  }
+
+  .hero-stats .hero-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* Phones in landscape specifically (max-height, not max-width — a phone
+   rotated sideways is often WIDER than the 720px breakpoint above, so
+   .hero-nav-links comes back from display:none at its full desktop size,
+   which doesn't fit next to the logo and button in one row — "Contact
+   Us", the last link, was the one wrapping onto its own line. Targeting
+   short height rather than width catches landscape phones specifically
+   without also matching tall desktop/tablet viewports. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero-content {
+    padding: 0.6rem clamp(1rem, 3vw, 2rem) 0.75rem;
+  }
+
+  .hero-nav {
+    gap: 0.6rem;
+  }
+
+  .hero-nav-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hero-nav-links {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.7rem;
+  }
+
+  .hero-nav-links a {
+    font-size: 0.6rem;
+  }
+
+  .hero-nav-cta .hero-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.55rem;
+  }
+
+  .hero-headline h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-tagline {
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+
+  .hero-stats {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-stats-list li {
+    padding-right: 0.5rem;
+  }
+
+  .hero-stats-list li + li {
+    padding-left: 0.5rem;
+  }
+
+  .hero-stats-list strong {
+    font-size: 0.85rem;
+  }
+
+  .hero-stats-list span {
+    font-size: 0.5rem;
+  }
+
+  .hero-stats .hero-btn {
+    width: auto;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.55rem;
   }
 }

@@ -12,7 +12,15 @@ const VH_PER_AMENITY = 78
 // as it unpins and hands off to Gallery scrolling up normally underneath.
 const SETTLE_VH = 28
 const SLIDE_VH = 90
-const LAST_ITEM_VH = SETTLE_VH + SLIDE_VH
+
+// A touch swipe covers far less physical distance per gesture than a
+// trackpad/mouse-wheel scroll — at the vh distances above (tuned by feel
+// for desktop), getting through this section on a phone took roughly
+// twice as many swipes as felt right. Shortening the same dwell
+// distances on narrow viewports fixes that without touching the desktop
+// feel or the easing/animation itself.
+const MOBILE_BREAKPOINT = '(max-width: 720px)'
+const MOBILE_VH_SCALE = 0.55
 
 function easeInOutCubic(x) {
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
@@ -81,14 +89,23 @@ const amenities = [
 ]
 
 const lastIndex = amenities.length - 1
-const regularTotalVh = lastIndex * VH_PER_AMENITY
-const totalDwellVh = regularTotalVh + LAST_ITEM_VH
 
 function AmenitiesSection() {
   const pinContainerRef = useRef(null)
   const pinRef = useRef(null)
   const rowRefs = useRef([])
   const poppedRef = useRef([])
+
+  // Read once on mount, same as the rest of this component's setup —
+  // this doesn't need to react live to resizing.
+  const [scale] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(MOBILE_BREAKPOINT).matches ? MOBILE_VH_SCALE : 1
+  )
+  const vhPerAmenity = VH_PER_AMENITY * scale
+  const settleVh = SETTLE_VH * scale
+  const slideVh = SLIDE_VH * scale
+  const regularTotalVh = lastIndex * vhPerAmenity
+  const totalDwellVh = regularTotalVh + settleVh + slideVh
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [frontLayer, setFrontLayer] = useState('a')
@@ -207,7 +224,7 @@ function AmenitiesSection() {
 
       const nextIndex = Math.min(
         lastIndex,
-        Math.max(0, Math.floor(scrolled / vhPx / VH_PER_AMENITY))
+        Math.max(0, Math.floor(scrolled / vhPx / vhPerAmenity))
       )
 
       if (!hoveringRef.current && nextIndex !== activeIndexRef.current) {
@@ -227,7 +244,7 @@ function AmenitiesSection() {
       const scrolledVh = scrolled / vhPx
       if (nextIndex === lastIndex) {
         const localVh = scrolledVh - regularTotalVh
-        exitProgress = Math.min(Math.max((localVh - SETTLE_VH) / SLIDE_VH, 0), 1)
+        exitProgress = Math.min(Math.max((localVh - settleVh) / slideVh, 0), 1)
       }
 
       const eased = easeInOutCubic(exitProgress)
@@ -257,11 +274,15 @@ function AmenitiesSection() {
       className="amenities-section"
       id="amenities"
       ref={pinContainerRef}
-      // +100vh: a sticky element of height 100vh only stays glued at top:0
-      // for (wrapperHeight - 100vh) of scroll — without that extra 100vh
-      // here, the panel would unstick (and start moving normally with the
-      // page) 100vh before the exit slide actually finishes.
-      style={{ height: `${totalDwellVh + 100}vh` }}
+      // The release runway (last term) has to match .amenities-pin's own
+      // *rendered* height exactly, or the pin unsticks at the wrong
+      // scroll position — a sticky element only stays glued at top:0 for
+      // (wrapperHeight - itsOwnHeight) of scroll. That's 100svh, not
+      // 100vh: .amenities-pin uses 100svh (see AmenitiesSection.css) so
+      // its real height matches what's actually visible on a phone with
+      // its address bar showing, rather than the larger, bar-collapsed
+      // 100vh, which used to push its bottom content past the true fold.
+      style={{ height: `calc(${totalDwellVh}vh + 100svh)` }}
     >
       <div className="amenities-pin" ref={pinRef}>
         <div className="amenities-header">
@@ -296,7 +317,9 @@ function AmenitiesSection() {
               />
               <div className="amenities-image-overlay" />
               <div className="amenities-image-caption">
-                <span className="amenities-image-caption-label">{amenities[activeIndex].name}</span>
+                <span className="amenities-image-caption-label" key={activeIndex}>
+                  {amenities[activeIndex].name}
+                </span>
               </div>
             </div>
           </div>

@@ -55,13 +55,15 @@ const villas = [
 ]
 
 function VillasSection() {
+  const sectionRef = useRef(null)
   const wrapperRefs = useRef([])
   const innerRefs = useRef([])
   const [activeVilla, setActiveVilla] = useState(null)
 
   useEffect(() => {
+    const section = sectionRef.current
     const wrappers = wrapperRefs.current
-    if (!wrappers.some(Boolean)) return
+    if (!section || !wrappers.some(Boolean)) return
 
     let ticking = false
 
@@ -90,13 +92,36 @@ function VillasSection() {
       }
     }
 
-    updateReveal()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    // Only listen while this section is anywhere near the viewport — see
+    // the same gating in AboutSection.jsx for why (five always-on
+    // scroll+rAF handlers on one page otherwise compete for every single
+    // frame's budget regardless of which section is actually in view).
+    let cleanupScroll = null
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!cleanupScroll) {
+            updateReveal()
+            window.addEventListener('scroll', onScroll, { passive: true })
+            cleanupScroll = () => window.removeEventListener('scroll', onScroll)
+          }
+        } else if (cleanupScroll) {
+          cleanupScroll()
+          cleanupScroll = null
+        }
+      },
+      { rootMargin: '100% 0px 100% 0px' }
+    )
+    observer.observe(section)
+
+    return () => {
+      observer.disconnect()
+      cleanupScroll?.()
+    }
   }, [])
 
   return (
-    <section className="villas-section" id="villas">
+    <section className="villas-section" id="villas" ref={sectionRef}>
       <div className="villas-header">
         <span className="villas-eyebrow">
           <span className="villas-eyebrow-dot" />

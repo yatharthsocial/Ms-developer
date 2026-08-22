@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -49,6 +55,17 @@
     filter: invert(1) brightness(2);
   }
 }
+
+/* Deliberately NOT setting overflow-x:hidden on <html>/<body> here — on
+   this page they're ancestors of the Amenities/Gallery position:sticky
+   pinned sections, and overflow-x on an ancestor of a sticky element
+   auto-promotes that ancestor's overflow-y to `auto`, silently breaking
+   the pin (confirmed by testing: it drove .amenities-pin's rect.top to
+   -1350px instead of staying glued at 0). Any horizontal bleed instead
+   needs clipping locally, on the offending element or a wrapper that
+   sits *inside* the sticky element rather than above it — see
+   .about-media-ring in AboutSection.css and .gallery-intro-pin in
+   GallerySection.css for the actual fixes. */
 
 body {
   margin: 0;

@@ -191,6 +191,13 @@
   gap: 0.6rem;
 }
 
+.enquiry-phone-row > * {
+  /* See the same rule in ContactSection.css: grid items default to
+     min-width: auto, letting their content force this track wider than
+     8rem on narrow viewports. */
+  min-width: 0;
+}
+
 .enquiry-error {
   font-size: 0.75rem;
   color: #c65c73;

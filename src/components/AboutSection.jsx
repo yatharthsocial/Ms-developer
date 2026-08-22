@@ -87,9 +87,37 @@ function AboutSection() {
       }
     }
 
-    updateScrollEffects()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    // Only listen while this section is anywhere near the viewport. This
+    // page has five sections each running their own always-on scroll +
+    // rAF handler; left attached for the whole page lifetime, all five
+    // fire on every single scroll event everywhere (e.g. deep inside
+    // Amenities/Gallery), each forcing its own layout read — that
+    // cross-component contention is what showed up as scroll "friction"
+    // on weaker mobile CPUs. rootMargin gives a full viewport of lead-in
+    // so the effect is already producing current values by the time this
+    // section is actually visible, avoiding any stale-frame pop.
+    let cleanupScroll = null
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!cleanupScroll) {
+            updateScrollEffects()
+            window.addEventListener('scroll', onScroll, { passive: true })
+            cleanupScroll = () => window.removeEventListener('scroll', onScroll)
+          }
+        } else if (cleanupScroll) {
+          cleanupScroll()
+          cleanupScroll = null
+        }
+      },
+      { rootMargin: '100% 0px 100% 0px' }
+    )
+    observer.observe(section)
+
+    return () => {
+      observer.disconnect()
+      cleanupScroll?.()
+    }
   }, [])
 
   return (

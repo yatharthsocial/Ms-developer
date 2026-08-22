@@ -308,6 +308,15 @@ a.contact-info-line--link:hover {
   gap: 0.6rem;
 }
 
+.contact-phone-row > * {
+  /* Grid items default to min-width: auto, which lets their own content's
+     min-content size force a track wider than its explicit size (8rem
+     here) — on a narrow phone viewport that pushed this row a dozen-odd
+     pixels past the edge. min-width: 0 lets them actually shrink/truncate
+     to the track size instead. */
+  min-width: 0;
+}
+
 .contact-error {
   font-size: 0.75rem;
   color: #c65c73;

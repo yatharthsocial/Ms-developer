@@ -12,7 +12,14 @@
 .gallery-intro-pin {
   position: sticky;
   top: 0;
+  /* 100vh on mobile is measured against the LARGEST possible viewport
+     (address bar collapsed) — with the bar actually showing, that's
+     taller than what's really on screen (same fix as HeroSection.css
+     and AmenitiesSection.css). The wrapper's release-runway term in
+     GallerySection.jsx is matched to 100svh too; the two must stay in
+     sync or the pin unsticks at the wrong scroll position. */
   height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   /* Bottom-aligned rather than dead-center: the heading still holds one
@@ -23,7 +30,19 @@
   padding-bottom: clamp(2rem, 5vw, 3.5rem);
   box-sizing: border-box;
   opacity: 0;
-  will-change: transform, opacity;
+  will-change: opacity;
+  /* Clips .gallery-intro-slide's off-screen resting position (it starts
+     translated 55% to the right). This is safe here specifically because
+     it's set on the sticky element itself, not on one of ITS ancestors —
+     overflow on a position:sticky element clipping its own children
+     doesn't touch how that element sticks relative to its own parent, so
+     it doesn't trip the sticky-breaking overflow-x trap noted elsewhere
+     in this file and in AmenitiesSection.css. */
+  overflow: hidden;
+}
+
+.gallery-intro-slide {
+  will-change: transform;
 }
 
 .gallery-header {
@@ -263,6 +282,29 @@
 
   .gallery-item--tall {
     grid-row: span 1;
+  }
+}
+
+/* .gallery-intro-pin bottom-anchors its heading with headroom above by
+   design (see the comment on it up top) — reads fine on a tall desktop
+   screen, but measured directly on a short landscape phone: the heading
+   sat in only the bottom third of the 100vh pin, leaving roughly 60% of
+   the screen blank above it. That's not a scroll glitch, just this
+   proportion looking broken on a much shorter viewport — centering it
+   instead (and shrinking the text) fits a short screen far better. */
+@media (max-width: 900px) and (orientation: landscape) {
+  .gallery-intro-pin {
+    justify-content: center;
+    padding-bottom: 0;
+  }
+
+  .gallery-header h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .gallery-header p {
+    font-size: 0.75rem;
   }
 }
 

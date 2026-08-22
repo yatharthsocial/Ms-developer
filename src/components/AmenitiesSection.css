@@ -11,7 +11,17 @@
 .amenities-pin {
   position: sticky;
   top: 0;
+  /* 100vh on mobile is measured against the LARGEST possible viewport
+     (address bar collapsed) — on a real phone with the bar actually
+     showing, that's taller than what's really on screen, so the bottom
+     of the video/row list was getting pushed past the true visible edge
+     (see HeroSection.css for the same fix, first found there). Because
+     this element is height-critical to the sticky-scroll math in
+     AmenitiesSection.jsx, its wrapper's "+100" release-runway term is
+     matched to 100svh there too — the two must stay in sync or the pin
+     unsticks at the wrong scroll position. */
   height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -96,7 +106,13 @@
   object-fit: cover;
   display: block;
   opacity: 0;
-  transition: opacity 0.6s ease;
+  /* Shorter than before (was 0.6s) — at 0.6s, scrolling slowly enough to
+     actually watch the swap happen made the caption (which changes
+     instantly, see .amenities-image-caption-label below) visibly outrun
+     the video fade, reading as "wrong video for half a second". Fast
+     scrolling never showed it because attention had already moved on by
+     the time the fade caught up. */
+  transition: opacity 0.28s ease;
 }
 
 .amenities-video.is-front {
@@ -117,9 +133,26 @@
 }
 
 .amenities-image-caption-label {
+  display: inline-block;
   font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.01em;
+  /* Remounted with a fresh key on every amenity change (see
+     AmenitiesSection.jsx) so this animation replays each time, fading the
+     new label in over roughly the same window as the video crossfade
+     above instead of snapping to the new name instantly. */
+  animation: amenity-caption-fade 0.28s ease both;
+}
+
+@keyframes amenity-caption-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .amenities-list {
@@ -227,7 +260,14 @@
   margin: 0;
 }
 
-@media (max-width: 900px) {
+/* orientation: portrait — a landscape phone is often narrower than
+   900px too, but .amenities-pin is a hard height: 100vh (not min-height
+   — it has to stay exactly that for the sticky-scroll math elsewhere in
+   this file to work), with overflow: hidden. Stacking the video above
+   all 4 rows only fits within a TALL narrow portrait screen; on a
+   WIDE-but-SHORT landscape one the same stack simply doesn't fit and
+   gets clipped instead of growing, which is what was happening here. */
+@media (max-width: 900px) and (orientation: portrait) {
   .amenities-layout {
     grid-template-columns: 1fr;
   }
@@ -238,5 +278,70 @@
 
   .amenity-row {
     padding: 0.8rem 0.5rem;
+  }
+}
+
+/* Landscape phones keep the side-by-side layout (video next to the row
+   list, same as desktop) since it's far more compact vertically than
+   stacking — but everything still needs shrinking to actually fit
+   .amenities-pin's fixed, short height. */
+@media (max-width: 900px) and (orientation: landscape) {
+  .amenities-pin {
+    padding: 0.75rem clamp(1.25rem, 4vw, 2.5rem);
+  }
+
+  .amenities-header {
+    margin: 0 auto 0.6rem;
+  }
+
+  .amenities-header h2 {
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .amenities-header p {
+    font-size: 0.7rem;
+  }
+
+  .amenities-layout {
+    gap: 1.25rem;
+  }
+
+  .amenities-image-wrapper {
+    min-height: 0;
+  }
+
+  .amenity-row {
+    gap: 0.75rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .amenity-row-index {
+    width: 1.25rem;
+    font-size: 0.7rem;
+  }
+
+  .amenity-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .amenity-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .amenity-row-text h3 {
+    font-size: 0.8rem;
+    margin-bottom: 0;
+  }
+
+  /* Cut for space, not hidden by accident — the row's title plus the
+     caption already burned into the video itself (see
+     .amenities-image-caption-label) carries enough on a screen this
+     short; the fuller description reads better with room to breathe, on
+     portrait/desktop where there's height to spare. */
+  .amenity-row-text p {
+    display: none;
   }
 }

@@ -80,6 +80,18 @@
   margin-right: clamp(1rem, 3vw, 2rem);
 }
 
+@media (max-width: 767px) {
+  .about-media {
+    /* .about-media-ring below deliberately bleeds 45% past this box for a
+       soft glow — fine on desktop where there's slack around the whole
+       section, but on a narrow phone viewport .about-media already
+       nearly fills the screen, so that bleed pushed real content past
+       the edge and made the whole page pannable sideways. Clipping only
+       below this breakpoint keeps the intended desktop effect intact. */
+    overflow: hidden;
+  }
+}
+
 .about-media-ring {
   position: absolute;
   top: 45%;
@@ -145,7 +157,15 @@
   white-space: nowrap;
 }
 
-@media (max-width: 900px) {
+/* orientation: portrait matters here — a landscape phone is often
+   narrower than 900px too, but stacking image/text/stats into one
+   narrow column (meant for a tall portrait screen) on a WIDE-but-SHORT
+   landscape screen produces an oddly narrow strip of content with most
+   of the width sitting blank, that then needs several extra screens of
+   scrolling to get through — it looked "broken" without technically
+   clipping anything. Landscape phones have the width to spare for the
+   side-by-side layout below, same as desktop. */
+@media (max-width: 900px) and (orientation: portrait) {
   .about-content {
     grid-template-columns: 1fr;
   }
@@ -157,6 +177,34 @@
   }
 
   .about-stats {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Landscape phones keep the side-by-side layout above, but still need
+   their own pass: the desktop grid_template_columns leaves room for a
+   separate auto-width stats column that doesn't exist here (stats stay
+   inline in the stacked rule above, only reachable in portrait), and
+   vertical padding/gaps tuned for a tall screen are excessive on a
+   short one. */
+@media (max-width: 900px) and (orientation: landscape) {
+  .about-section {
+    padding-top: clamp(1.5rem, 5vh, 3rem);
+    padding-bottom: clamp(1.5rem, 5vh, 3rem);
+  }
+
+  .about-content {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .about-media {
+    max-width: 20rem;
+  }
+
+  .about-stats {
+    grid-column: 1 / -1;
     flex-direction: row;
     justify-content: space-between;
   }

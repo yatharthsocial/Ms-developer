@@ -21,6 +21,15 @@ function easeOutCubic(x) {
 // picks up right as the heading starts leaving.
 const INTRO_DWELL_VH = 68
 
+// A touch swipe covers far less physical distance per gesture than a
+// trackpad/mouse-wheel scroll — at INTRO_DWELL_VH above (tuned by feel
+// for desktop), the heading took roughly twice as many swipes as felt
+// right to finish sliding in on a phone. Shortening the same dwell
+// distance on narrow viewports fixes that without touching the desktop
+// feel or the easing itself (same approach as AmenitiesSection.jsx).
+const MOBILE_BREAKPOINT = '(max-width: 720px)'
+const MOBILE_VH_SCALE = 0.55
+
 // Four equal tall columns rather than a hero + tall mix — with four
 // portrait clips, a clean filmstrip of four reads better than forcing an
 // odd item into a leftover corner, and tall columns crop portrait video
@@ -35,12 +44,20 @@ const gallery = [
 function GallerySection() {
   const introStageRef = useRef(null)
   const introPinRef = useRef(null)
+  const introSlideRef = useRef(null)
   const tileRefs = useRef([])
   const videoRefs = useRef([])
   const fullscreenVideoRef = useRef(null)
   // Grid videos always play muted on loop; clicking one opens it fullscreen
   // with sound instead of toggling sound in place.
   const [activeVideo, setActiveVideo] = useState(null)
+
+  // Read once on mount, same as AmenitiesSection.jsx — doesn't need to
+  // react live to resizing.
+  const [scale] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(MOBILE_BREAKPOINT).matches ? MOBILE_VH_SCALE : 1
+  )
+  const introDwellVh = INTRO_DWELL_VH * scale
 
   // The heading is pinned dead-center for its own dwell while it slides in
   // from the right (zero vertical motion — see INTRO_DWELL_VH above), then
@@ -52,7 +69,8 @@ function GallerySection() {
   useEffect(() => {
     const stage = introStageRef.current
     const pin = introPinRef.current
-    if (!stage || !pin) return
+    const slide = introSlideRef.current
+    if (!stage || !pin || !slide) return
 
     let ticking = false
     const playedVideoAt = []
@@ -62,10 +80,17 @@ function GallerySection() {
       const vhPx = viewportHeight / 100
 
       const stageTop = stage.getBoundingClientRect().top
-      const introProgress = Math.min(Math.max(-stageTop / (vhPx * INTRO_DWELL_VH), 0), 1)
+      const introProgress = Math.min(Math.max(-stageTop / (vhPx * introDwellVh), 0), 1)
       const introEased = easeOutCubic(introProgress)
 
-      pin.style.transform = `translateX(${(1 - introEased) * 55}%)`
+      // The slide moves on an inner wrapper, not the sticky pin itself —
+      // .gallery-intro-pin stays put and clips it (overflow: hidden), so
+      // the off-screen resting position (translateX 55%) never bleeds
+      // into the page's own scrollable width. Doing this translate on the
+      // pin directly used to push real layout overflow out to the right
+      // on narrow/mobile viewports, making the whole page pannable
+      // sideways — see GallerySection.css.
+      slide.style.transform = `translateX(${(1 - introEased) * 55}%)`
       pin.style.opacity = String(introEased)
 
       tileRefs.current.forEach((tile, i) => {
@@ -138,15 +163,25 @@ function GallerySection() {
 
   return (
     <section className="gallery-section" id="gallery">
-      <div className="gallery-intro-stage" ref={introStageRef} style={{ height: `${INTRO_DWELL_VH + 100}vh` }}>
+      <div
+        className="gallery-intro-stage"
+        ref={introStageRef}
+        // The release runway (last term) must match .gallery-intro-pin's
+        // own *rendered* height exactly (100svh, not 100vh — see the
+        // comment in GallerySection.css) or the pin unsticks at the
+        // wrong scroll position. Same fix as AmenitiesSection.jsx.
+        style={{ height: `calc(${introDwellVh}vh + 100svh)` }}
+      >
         <div className="gallery-intro-pin" ref={introPinRef}>
-          <div className="gallery-header">
-            <span className="gallery-eyebrow">
-              <span className="gallery-eyebrow-dot" />
-              Gallery
-            </span>
-            <h2>A Closer Look</h2>
-            <p>A few moments from across our villas — click any video to hear it.</p>
+          <div className="gallery-intro-slide" ref={introSlideRef}>
+            <div className="gallery-header">
+              <span className="gallery-eyebrow">
+                <span className="gallery-eyebrow-dot" />
+                Gallery
+              </span>
+              <h2>A Closer Look</h2>
+              <p>A few moments from across our villas — click any video to hear it.</p>
+            </div>
           </div>
         </div>
       </div>

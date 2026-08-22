@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import heroVideo from '../assets/hero-video-trimmed.mp4'
+import heroVideoMobile from '../assets/herosections.mp4'
 import logo from '../assets/logo.jpg'
 import './HeroSection.css'
 
@@ -32,14 +33,19 @@ function HeroSection() {
       <video
         ref={videoRef}
         className={`hero-video ${isLoaded ? 'is-loaded' : ''}`}
-        src={heroVideo}
         autoPlay
         muted
         playsInline
         preload="auto"
         onCanPlay={() => setIsLoaded(true)}
         onEnded={handleEnded}
-      />
+      >
+        {/* Vertically-shot clip for phones — browsers pick the first
+            matching <source>, evaluated once at load, so this doesn't
+            need to react to resizing the way layout CSS does. */}
+        <source media="(max-width: 767px)" src={heroVideoMobile} type="video/mp4" />
+        <source src={heroVideo} type="video/mp4" />
+      </video>
       <div className="hero-overlay" />
 
       <div className={`hero-content ${showOverlay ? 'is-visible' : ''}`}>

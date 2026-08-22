@@ -61,6 +61,7 @@ const infoCards = [
 ]
 
 function ContactSection() {
+  const sectionRef = useRef(null)
   const cardRefs = useRef([])
   const mapRef = useRef(null)
   const formRef = useRef(null)
@@ -79,10 +80,14 @@ function ContactSection() {
   // (Villas, Gallery): opacity/translateY computed from each element's own
   // position every frame, rather than an IntersectionObserver kicking off
   // a fixed-duration CSS animation — keeps this section's motion in step
-  // with actual scroll speed instead of its own separate timer.
+  // with actual scroll speed instead of its own separate timer. The
+  // IntersectionObserver added below is a different thing entirely: it
+  // only gates whether the scroll listener is attached at all (a perf
+  // measure, see the comment there), it never drives the reveal values.
   useEffect(() => {
+    const section = sectionRef.current
     const elements = [...cardRefs.current, mapRef.current, formRef.current].filter(Boolean)
-    if (!elements.length) return
+    if (!section || !elements.length) return
 
     let ticking = false
 
@@ -109,9 +114,32 @@ function ContactSection() {
       }
     }
 
-    updateReveal()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    // Only listen while this section is anywhere near the viewport — see
+    // the same gating in AboutSection.jsx for why (five always-on
+    // scroll+rAF handlers on one page otherwise compete for every single
+    // frame's budget regardless of which section is actually in view).
+    let cleanupScroll = null
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!cleanupScroll) {
+            updateReveal()
+            window.addEventListener('scroll', onScroll, { passive: true })
+            cleanupScroll = () => window.removeEventListener('scroll', onScroll)
+          }
+        } else if (cleanupScroll) {
+          cleanupScroll()
+          cleanupScroll = null
+        }
+      },
+      { rootMargin: '100% 0px 100% 0px' }
+    )
+    observer.observe(section)
+
+    return () => {
+      observer.disconnect()
+      cleanupScroll?.()
+    }
   }, [])
 
   const handleNameChange = (e) => {
@@ -151,7 +179,7 @@ function ContactSection() {
   }
 
   return (
-    <section className="contact-section" id="contact">
+    <section className="contact-section" id="contact" ref={sectionRef}>
       <div className="contact-header">
         <span className="contact-eyebrow">
           <span className="contact-eyebrow-dot" />
