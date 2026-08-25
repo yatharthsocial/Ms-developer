@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import CountrySelect, { countries } from './CountrySelect'
 import { validateEmail, validateName, validatePhone } from './formValidation'
+import { submitEnquiry } from './submitEnquiry'
 import './EnquiryModal.css'
 
 function EnquiryModal({ villa, onClose }) {
@@ -32,7 +33,7 @@ function EnquiryModal({ villa, onClose }) {
   }
 
   const handlePhoneChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, country.digits)
+    const value = e.target.value.replace(/\D/g, '').slice(0, 15)
     setPhone(value)
     if (errors.phone) setErrors((prev) => ({ ...prev, phone: validatePhone(value, country) }))
   }
@@ -40,10 +41,8 @@ function EnquiryModal({ villa, onClose }) {
   const handleCountryChange = (nextCode) => {
     const nextCountry = countries.find((c) => c.code === nextCode)
     setCountryCode(nextCode)
-    const trimmedPhone = phone.slice(0, nextCountry.digits)
-    setPhone(trimmedPhone)
     if (errors.phone) {
-      setErrors((prev) => ({ ...prev, phone: validatePhone(trimmedPhone, nextCountry) }))
+      setErrors((prev) => ({ ...prev, phone: validatePhone(phone, nextCountry) }))
     }
   }
 
@@ -59,6 +58,15 @@ function EnquiryModal({ villa, onClose }) {
     if (nameError || phoneError || emailError) return
 
     setSubmitted(true)
+
+    submitEnquiry({
+      source: 'Villa Enquiry',
+      villa: villa?.name || '',
+      name,
+      phone: `${country.dial} ${phone}`,
+      email,
+      message,
+    })
 
     if (villa?.brochure) {
       const link = document.createElement('a')
@@ -138,7 +146,7 @@ function EnquiryModal({ villa, onClose }) {
                       value={phone}
                       onChange={handlePhoneChange}
                       onBlur={() => setErrors((prev) => ({ ...prev, phone: validatePhone(phone, country) }))}
-                      placeholder={`${country.digits}-digit number`}
+                      placeholder="Phone number"
                       className={errors.phone ? 'has-error' : ''}
                     />
                   </div>

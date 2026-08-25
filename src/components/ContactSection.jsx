@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import CountrySelect, { countries } from './CountrySelect'
 import { validateEmail, validateName, validatePhone } from './formValidation'
+import { submitEnquiry } from './submitEnquiry'
 import './ContactSection.css'
 
 // Each line can carry its own `href` (so, e.g., three separate phone
@@ -149,7 +150,7 @@ function ContactSection() {
   }
 
   const handlePhoneChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, country.digits)
+    const value = e.target.value.replace(/\D/g, '').slice(0, 15)
     setPhone(value)
     if (errors.phone) setErrors((prev) => ({ ...prev, phone: validatePhone(value, country) }))
   }
@@ -157,10 +158,8 @@ function ContactSection() {
   const handleCountryChange = (nextCode) => {
     const nextCountry = countries.find((c) => c.code === nextCode)
     setCountryCode(nextCode)
-    const trimmedPhone = phone.slice(0, nextCountry.digits)
-    setPhone(trimmedPhone)
     if (errors.phone) {
-      setErrors((prev) => ({ ...prev, phone: validatePhone(trimmedPhone, nextCountry) }))
+      setErrors((prev) => ({ ...prev, phone: validatePhone(phone, nextCountry) }))
     }
   }
 
@@ -176,6 +175,15 @@ function ContactSection() {
     if (nameError || phoneError || emailError) return
 
     setSubmitted(true)
+
+    submitEnquiry({
+      source: 'Contact Section',
+      villa: '',
+      name,
+      phone: `${country.dial} ${phone}`,
+      email,
+      message,
+    })
   }
 
   return (
@@ -285,7 +293,7 @@ function ContactSection() {
                     value={phone}
                     onChange={handlePhoneChange}
                     onBlur={() => setErrors((prev) => ({ ...prev, phone: validatePhone(phone, country) }))}
-                    placeholder={`${country.digits}-digit number`}
+                    placeholder="Phone number"
                     className={errors.phone ? 'has-error' : ''}
                   />
                 </div>

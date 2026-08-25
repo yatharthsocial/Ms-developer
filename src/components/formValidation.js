@@ -1,3 +1,5 @@
+import { isValidPhoneNumber } from 'libphonenumber-js/min'
+
 const NAME_REGEX = /^[A-Za-z]+(?:[' -][A-Za-z]+)*$/
 
 export function validateName(value) {
@@ -9,7 +11,7 @@ export function validateName(value) {
 export function validatePhone(value, country) {
   if (!value) return 'Phone number is required'
   if (!/^\d+$/.test(value)) return 'Digits only'
-  if (value.length !== country.digits) return `Enter a valid ${country.digits}-digit number for ${country.name}`
+  if (!isValidPhoneNumber(value, country.code)) return `Enter a valid phone number for ${country.name}`
   return ''
 }
 

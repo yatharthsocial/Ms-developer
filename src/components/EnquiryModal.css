@@ -310,9 +310,9 @@
   box-shadow: 0 0 0 4px rgba(181, 162, 199, 0.18);
 }
 
-.country-select-name {
-  color: #6b6572;
-  font-weight: 500;
+.country-select-flag {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .country-select-chevron {
@@ -334,12 +334,11 @@
   left: 0;
   z-index: 10;
   width: max-content;
-  min-width: 100%;
-  max-height: 14rem;
-  overflow-y: auto;
-  list-style: none;
-  margin: 0;
-  padding: 0.4rem;
+  min-width: 15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 16px 40px rgba(22, 19, 26, 0.22);
@@ -354,6 +353,34 @@
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+}
+
+.country-select-search {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(22, 19, 26, 0.12);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.country-select-search:focus {
+  border-color: #b5a2c7;
+}
+
+.country-select-options {
+  max-height: 14rem;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.country-select-empty {
+  padding: 0.55rem 0.65rem;
+  font-size: 0.85rem;
+  color: #6b6572;
 }
 
 .country-select-option {
@@ -381,6 +408,11 @@
 .country-select-option.is-selected {
   background: rgba(181, 162, 199, 0.16);
   font-weight: 600;
+}
+
+.country-select-option-flag {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .country-select-option-dial {
