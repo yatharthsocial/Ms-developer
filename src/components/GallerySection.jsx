@@ -4,6 +4,22 @@ import galleryVideo1 from '../assets/gallery01.mp4'
 import galleryVideo2 from '../assets/gallery02.mp4'
 import galleryVideo3 from '../assets/gallery03.mp4'
 import galleryVideo4 from '../assets/gallery04.mp4'
+import villa1Exterior from '../assets/villa1-exterior.mp4'
+import villa1GroundFloor from '../assets/villa1-ground-floor.jpg'
+import villa1FirstFloor from '../assets/villa1-first-floor.jpg'
+import villa1SecondFloor from '../assets/villa1-second-floor.jpg'
+import villa2Exterior from '../assets/villa2-exterior.mp4'
+import villa2CellarFloor from '../assets/villa2-cellar-floor.jpg'
+import villa2GroundFloor from '../assets/villa2-ground-floor.jpg'
+import villa2FirstFloor from '../assets/villa2-first-floor.jpg'
+import villa3SecondFloorVideo from '../assets/villa3-second-floor.mp4'
+import villa3GroundFloor from '../assets/villa3-ground-floor.jpg'
+import villa3FirstFloor from '../assets/villa3-first-floor.jpg'
+import villa3SecondFloor from '../assets/villa3-second-floor.jpg'
+import interiorKitchen from '../assets/interior-kitchen.jpg'
+import interiorBathroom from '../assets/interior-bathroom.jpg'
+import interiorTerrace from '../assets/interior-terrace.jpg'
+import interiorPool from '../assets/interior-pool.jpg'
 import './GallerySection.css'
 
 function easeOutCubic(x) {
@@ -34,23 +50,66 @@ const MOBILE_VH_SCALE = 0.55
 // portrait clips, a clean filmstrip of four reads better than forcing an
 // odd item into a leftover corner, and tall columns crop portrait video
 // more gracefully than a wide/square one would.
+//
+// `category` ties an item to exactly one filter pill — including
+// "Videos" itself, which is its own category (the four original clips)
+// rather than an "everything" view, so a villa's assets show only under
+// that villa's own pill and nowhere else.
 const gallery = [
-  { id: '01', name: 'Prime Location', tag: 'Video', video: galleryVideo1, size: 'gallery-item--tall' },
-  { id: '02', name: 'Villa by Night', tag: 'Video', video: galleryVideo2, size: 'gallery-item--tall' },
-  { id: '03', name: 'Rooftop Pool Walkthrough', tag: 'Video', video: galleryVideo3, size: 'gallery-item--tall' },
-  { id: '04', name: 'Aerial Overview', tag: 'Video', video: galleryVideo4, size: 'gallery-item--tall' },
+  { id: 'prime-location', name: 'Prime Location', tag: 'Video', type: 'video', video: galleryVideo1, size: 'gallery-item--tall', category: 'Videos' },
+  { id: 'villa-by-night', name: 'Villa by Night', tag: 'Video', type: 'video', video: galleryVideo2, size: 'gallery-item--tall', category: 'Videos' },
+  { id: 'rooftop-pool', name: 'Rooftop Pool Walkthrough', tag: 'Video', type: 'video', video: galleryVideo3, size: 'gallery-item--tall', category: 'Videos' },
+  { id: 'aerial-overview', name: 'Aerial Overview', tag: 'Video', type: 'video', video: galleryVideo4, size: 'gallery-item--tall', category: 'Videos' },
+
+  { id: 'villa1-exterior', name: 'City Villa 1 — Exterior', tag: 'Video', type: 'video', video: villa1Exterior, size: 'gallery-item--tall', category: 'City Villa 1' },
+  { id: 'villa1-ground-floor', name: 'Ground Floor Plan', tag: 'Floor Plan', type: 'image', image: villa1GroundFloor, size: 'gallery-item--tall', category: 'City Villa 1' },
+  { id: 'villa1-first-floor', name: 'First Floor Plan', tag: 'Floor Plan', type: 'image', image: villa1FirstFloor, size: 'gallery-item--tall', category: 'City Villa 1' },
+  { id: 'villa1-second-floor', name: 'Second Floor Plan', tag: 'Floor Plan', type: 'image', image: villa1SecondFloor, size: 'gallery-item--tall', category: 'City Villa 1' },
+
+  { id: 'villa2-exterior', name: 'City Villa 2 — Exterior Walkthrough', tag: 'Video', type: 'video', video: villa2Exterior, size: 'gallery-item--tall', category: 'City Villa 2' },
+  { id: 'villa2-cellar-floor', name: 'Cellar Floor Plan', tag: 'Floor Plan', type: 'image', image: villa2CellarFloor, size: 'gallery-item--tall', category: 'City Villa 2' },
+  { id: 'villa2-ground-floor', name: 'Ground Floor Plan', tag: 'Floor Plan', type: 'image', image: villa2GroundFloor, size: 'gallery-item--tall', category: 'City Villa 2' },
+  { id: 'villa2-first-floor', name: 'First Floor Plan', tag: 'Floor Plan', type: 'image', image: villa2FirstFloor, size: 'gallery-item--tall', category: 'City Villa 2' },
+
+  { id: 'villa3-second-floor-video', name: 'City Villa 3 — Second Floor Walkthrough', tag: 'Video', type: 'video', video: villa3SecondFloorVideo, size: 'gallery-item--tall', category: 'City Villa 3' },
+  { id: 'villa3-ground-floor', name: 'Ground Floor Plan', tag: 'Floor Plan', type: 'image', image: villa3GroundFloor, size: 'gallery-item--tall', category: 'City Villa 3' },
+  { id: 'villa3-first-floor', name: 'First Floor Plan', tag: 'Floor Plan', type: 'image', image: villa3FirstFloor, size: 'gallery-item--tall', category: 'City Villa 3' },
+  { id: 'villa3-second-floor', name: 'Second Floor Plan', tag: 'Floor Plan', type: 'image', image: villa3SecondFloor, size: 'gallery-item--tall', category: 'City Villa 3' },
+
+  { id: 'interior-kitchen', name: 'Kitchen', tag: 'Photo', type: 'image', image: interiorKitchen, size: 'gallery-item--tall', category: 'Interior' },
+  { id: 'interior-bathroom', name: 'Bathroom', tag: 'Photo', type: 'image', image: interiorBathroom, size: 'gallery-item--tall', category: 'Interior' },
+  { id: 'interior-terrace', name: 'Terrace', tag: 'Photo', type: 'image', image: interiorTerrace, size: 'gallery-item--tall', category: 'Interior' },
+  { id: 'interior-pool', name: 'Indoor Pool', tag: 'Photo', type: 'image', image: interiorPool, size: 'gallery-item--tall', category: 'Interior' },
 ]
+
+// Each pill shows only its own category's items now — "Videos" is the
+// four original, unbranded clips; City Villa 1/2/3 each show that
+// villa's own exterior/walkthrough footage plus its floor plans;
+// "Interior" shows real photos of finished interior spaces (kitchen,
+// bathroom, terrace, indoor pool) rather than renders. A pill with
+// nothing tagged falls back to the empty state below the grid instead of
+// showing blank space — the pattern each villa followed before its own
+// folder was added.
+const filters = ['Videos', 'City Villa 1', 'City Villa 2', 'City Villa 3', 'Interior']
+
+// How much each filter pill's own reveal progress lags the one before it
+// (as a fraction of the shared scroll range below), so they pop in one at
+// a time left-to-right instead of all at once.
+const FILTER_STAGGER = 0.16
 
 function GallerySection() {
   const introStageRef = useRef(null)
   const introPinRef = useRef(null)
   const introSlideRef = useRef(null)
+  const filterRefs = useRef([])
   const tileRefs = useRef([])
   const videoRefs = useRef([])
   const fullscreenVideoRef = useRef(null)
   // Grid videos always play muted on loop; clicking one opens it fullscreen
-  // with sound instead of toggling sound in place.
-  const [activeVideo, setActiveVideo] = useState(null)
+  // with sound instead of toggling sound in place. Clicking an image (a
+  // floor plan) just opens it larger — no sound involved, same lightbox.
+  const [activeMedia, setActiveMedia] = useState(null)
+  const [activeFilter, setActiveFilter] = useState(filters[0])
 
   // Read once on mount, same as AmenitiesSection.jsx — doesn't need to
   // react live to resizing.
@@ -59,6 +118,8 @@ function GallerySection() {
   )
   const introDwellVh = INTRO_DWELL_VH * scale
 
+  const visibleGallery = gallery.filter((item) => item.category === activeFilter)
+
   // The heading is pinned dead-center for its own dwell while it slides in
   // from the right (zero vertical motion — see INTRO_DWELL_VH above), then
   // unpins and moves up normally. The grid's own fade-and-rise is a
@@ -66,6 +127,11 @@ function GallerySection() {
   // position in the very same frame, so once the heading starts leaving,
   // the grid rising up underneath it reads as a continuous handoff rather
   // than a delayed pop-in.
+  //
+  // Re-runs on every activeFilter change (not just on mount) and calls
+  // updateReveal() once immediately below — switching filters swaps in a
+  // new, still-scrolled-into-view set of tiles that would otherwise sit at
+  // their CSS-default opacity: 0 forever until the next scroll event.
   useEffect(() => {
     const stage = introStageRef.current
     const pin = introPinRef.current
@@ -93,6 +159,28 @@ function GallerySection() {
       slide.style.transform = `translateX(${(1 - introEased) * 55}%)`
       pin.style.opacity = String(introEased)
 
+      // The filter row sits right above the grid in normal flow (not
+      // pinned), so it reaches these same thresholds slightly before the
+      // tiles below it do — giving a natural "filters settle, then the
+      // videos rise in under them" order. Each pill's raw progress is
+      // pushed back by FILTER_STAGGER * i and rescaled to 0–1, so instead
+      // of every pill fading in at once, they pop in left-to-right as the
+      // section scrolls past.
+      filterRefs.current.forEach((btn, i) => {
+        if (!btn) return
+
+        const top = btn.getBoundingClientRect().top
+        const start = viewportHeight * 0.95
+        const end = viewportHeight * 0.7
+        const raw = Math.min(Math.max((start - top) / (start - end), 0), 1)
+        const stagger = FILTER_STAGGER * i
+        const progress = Math.min(Math.max((raw - stagger) / (1 - stagger), 0), 1)
+        const eased = easeOutCubic(progress)
+
+        btn.style.opacity = String(eased)
+        btn.style.transform = `translateY(${(1 - eased) * 14}px) scale(${0.82 + eased * 0.18})`
+      })
+
       tileRefs.current.forEach((tile, i) => {
         if (!tile) return
 
@@ -105,8 +193,9 @@ function GallerySection() {
         tile.style.transform = `translateY(${(1 - progress) * 32}px)`
 
         // Videos only start loading + playing once actually scrolled into
-        // view, rather than fetching all three up front.
-        if (progress > 0 && !playedVideoAt[i]) {
+        // view, rather than fetching all three up front. Floor-plan images
+        // have no videoRefs entry, so this is a no-op for them.
+        if (progress > 0 && !playedVideoAt[i] && visibleGallery[i]?.type === 'video') {
           playedVideoAt[i] = true
           videoRefs.current[i]?.play().catch(() => {})
         }
@@ -125,30 +214,34 @@ function GallerySection() {
     updateReveal()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [activeFilter])
+
+  // Clicking a video tile opens it fullscreen with sound on, the grid tile
+  // behind it kept quietly looping, muted. Clicking an image tile (a floor
+  // plan) opens the same lightbox with the full image instead — no sound
+  // to manage there.
+  const openMedia = useCallback((item, i) => {
+    if (item.type === 'video') {
+      const gridVideo = videoRefs.current[i]
+      if (gridVideo) gridVideo.muted = true
+    }
+    setActiveMedia(item)
   }, [])
 
-  // Clicking a tile opens that video fullscreen with sound on; the grid
-  // tile behind it keeps quietly looping, muted, exactly as before.
-  const openVideo = useCallback((item, i) => {
-    const gridVideo = videoRefs.current[i]
-    if (gridVideo) gridVideo.muted = true
-    setActiveVideo(item)
-  }, [])
-
-  const closeVideo = useCallback(() => {
+  const closeMedia = useCallback(() => {
     const video = fullscreenVideoRef.current
     if (video) {
       video.pause()
       video.currentTime = 0
     }
-    setActiveVideo(null)
+    setActiveMedia(null)
   }, [])
 
   useEffect(() => {
-    if (!activeVideo) return
+    if (!activeMedia) return
 
     const onKeyDown = (e) => {
-      if (e.key === 'Escape') closeVideo()
+      if (e.key === 'Escape') closeMedia()
     }
 
     document.addEventListener('keydown', onKeyDown)
@@ -159,7 +252,7 @@ function GallerySection() {
       document.removeEventListener('keydown', onKeyDown)
       document.body.style.overflow = prevOverflow
     }
-  }, [activeVideo, closeVideo])
+  }, [activeMedia, closeMedia])
 
   return (
     <section className="gallery-section" id="gallery">
@@ -186,60 +279,92 @@ function GallerySection() {
         </div>
       </div>
 
-      <div className="gallery-grid">
-        {gallery.map((item, i) => (
+      <div className="gallery-filters">
+        {filters.map((label, i) => (
           <button
             type="button"
-            key={item.id}
-            className={`gallery-item gallery-item--video ${item.size}`}
-            ref={(el) => (tileRefs.current[i] = el)}
-            onClick={() => openVideo(item, i)}
-            aria-label={`Play ${item.name} fullscreen with sound`}
+            key={label}
+            className={`gallery-filter-btn ${activeFilter === label ? 'is-active' : ''}`}
+            ref={(el) => (filterRefs.current[i] = el)}
+            onClick={() => setActiveFilter(label)}
+            aria-pressed={activeFilter === label}
           >
-            <video
-              ref={(el) => (videoRefs.current[i] = el)}
-              src={item.video}
-              muted
-              loop
-              playsInline
-              preload="none"
-            />
-            <span className="gallery-item-overlay" />
-            <span className="gallery-item-index">{item.id}</span>
-            <span className="gallery-item-expand" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 3h6v6" />
-                <path d="M9 21H3v-6" />
-                <path d="M21 3l-7 7" />
-                <path d="M3 21l7-7" />
-              </svg>
-            </span>
-            <span className="gallery-item-caption">
-              <span className="gallery-item-tag">{item.tag}</span>
-              <span className="gallery-item-name">{item.name}</span>
-            </span>
+            {label}
           </button>
         ))}
       </div>
 
-      {activeVideo &&
+      {visibleGallery.length > 0 ? (
+        <div className="gallery-grid">
+          {visibleGallery.map((item, i) => (
+            <button
+              type="button"
+              key={item.id}
+              className={`gallery-item gallery-item--${item.type} ${item.size}`}
+              ref={(el) => (tileRefs.current[i] = el)}
+              onClick={() => openMedia(item, i)}
+              aria-label={item.type === 'video' ? `Play ${item.name} fullscreen with sound` : `View ${item.name} fullscreen`}
+            >
+              {item.type === 'video' ? (
+                <video
+                  ref={(el) => (videoRefs.current[i] = el)}
+                  src={item.video}
+                  muted
+                  loop
+                  playsInline
+                  preload="none"
+                />
+              ) : (
+                <img src={item.image} alt={item.name} loading="lazy" />
+              )}
+              <span className="gallery-item-overlay" />
+              <span className="gallery-item-index">{String(i + 1).padStart(2, '0')}</span>
+              <span className="gallery-item-expand" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h6v6" />
+                  <path d="M9 21H3v-6" />
+                  <path d="M21 3l-7 7" />
+                  <path d="M3 21l7-7" />
+                </svg>
+              </span>
+              <span className="gallery-item-caption">
+                <span className="gallery-item-tag">{item.tag}</span>
+                <span className="gallery-item-name">{item.name}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        // A villa with no tagged footage yet (see the `filters` comment
+        // above) — a friendly placeholder instead of a blank stretch of
+        // page under the pills.
+        <div className="gallery-empty">
+          <p>More from {activeFilter} is on the way — check back soon.</p>
+        </div>
+      )}
+
+      {activeMedia &&
         createPortal(
-          <div className="gallery-lightbox" onMouseDown={(e) => e.target === e.currentTarget && closeVideo()}>
-            <button type="button" className="gallery-lightbox-close" onClick={closeVideo} aria-label="Close">
+          <div className="gallery-lightbox" onMouseDown={(e) => e.target === e.currentTarget && closeMedia()}>
+            <button type="button" className="gallery-lightbox-close" onClick={closeMedia} aria-label="Close">
               &times;
             </button>
             <div className="gallery-lightbox-frame">
-              <video
-                ref={fullscreenVideoRef}
-                src={activeVideo.video}
-                autoPlay
-                controls
-                playsInline
-                loop
-              />
+              {activeMedia.type === 'video' ? (
+                <video
+                  ref={fullscreenVideoRef}
+                  src={activeMedia.video}
+                  autoPlay
+                  controls
+                  playsInline
+                  loop
+                />
+              ) : (
+                <img src={activeMedia.image} alt={activeMedia.name} />
+              )}
               <div className="gallery-lightbox-caption">
-                <span className="gallery-lightbox-tag">{activeVideo.tag}</span>
-                <span className="gallery-lightbox-name">{activeVideo.name}</span>
+                <span className="gallery-lightbox-tag">{activeMedia.tag}</span>
+                <span className="gallery-lightbox-name">{activeMedia.name}</span>
               </div>
             </div>
           </div>,

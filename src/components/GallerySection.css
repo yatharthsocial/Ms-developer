@@ -85,6 +85,85 @@
   margin: 0;
 }
 
+/* Filter pills — sit between the intro heading and the grid, and pop in
+   staggered as the section scrolls into view (see the reveal effect in
+   GallerySection.jsx). Clicking one filters the grid below to that
+   villa's tagged items; see the `filters` comment there for how. */
+.gallery-filters {
+  max-width: 78rem;
+  margin: 0 auto clamp(1.5rem, 3vw, 2.25rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.gallery-filter-btn {
+  /* opacity/transform set inline every scroll frame, staggered per pill —
+     same continuous scroll-linked idiom as .gallery-item below, not a
+     time-triggered CSS animation. */
+  opacity: 0;
+  will-change: opacity, transform;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5a5560;
+  background: #fff;
+  border: 1px solid rgba(22, 19, 26, 0.08);
+  border-radius: 999px;
+  padding: 0.55rem 1.25rem;
+  cursor: pointer;
+  /* The opacity/transform half is what actually smooths the pop-in —
+     without it, the values GallerySection.jsx sets inline (whether from
+     a scroll frame or, now, an instant recompute right after a filter
+     click) apply with no interpolation at all. The rest (color/
+     background/etc.) are the existing hover/active-state transitions. */
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease,
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gallery-filter-btn:hover {
+  border-color: rgba(181, 162, 199, 0.5);
+  color: #16131a;
+}
+
+.gallery-filter-btn.is-active {
+  background: #16131a;
+  border-color: #16131a;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(22, 19, 26, 0.18);
+}
+
+/* Shown instead of the grid when the active pill's villa has no tagged
+   footage yet (City Villa 2/3, Interior) — a plain, quiet notice rather
+   than a jarring empty stretch of page right under the pills. */
+.gallery-empty {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+  border: 1px dashed rgba(22, 19, 26, 0.14);
+  border-radius: 14px;
+  text-align: center;
+  animation: gallery-empty-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes gallery-empty-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gallery-empty p {
+  font-size: 0.9rem;
+  color: #6b6572;
+  margin: 0;
+}
+
 /* Bento grid */
 
 .gallery-grid {
@@ -123,11 +202,28 @@
   font: inherit;
   text-align: left;
   box-shadow: 0 1px 0 rgba(22, 19, 26, 0.03);
-  transition: box-shadow 0.35s ease;
+  /* Real default (not just "whatever JS hasn't gotten to yet") — without
+     it, a freshly-mounted tile has no opacity rule at all until the
+     reveal effect's first inline-style write, so it paints at the
+     browser's native opacity: 1 for a frame. That's invisible on normal
+     scroll-in (JS gets there first), but on a filter click — where the
+     grid is already fully in view and every new tile's *target* opacity
+     is also ~1 — it meant nothing ever actually changed, so the
+     transition below had no delta to animate and tiles just hard-cut in.
+     Starting from a real 0 gives it one to animate every time. */
+  opacity: 0;
   /* opacity/transform are set inline every scroll frame (see the reveal
      effect in GallerySection.jsx) — continuous with the heading's own
      scroll-linked motion above it, rather than a separately time-triggered
-     fade-in, so the whole heading+grid reads as one connected movement. */
+     fade-in, so the whole heading+grid reads as one connected movement.
+     The matching transition here doesn't fight that: each scroll frame's
+     target only moves a fraction of a percent from the last, so it's
+     caught up well within the frame budget — what it actually does is
+     turn the single, instant opacity/transform jump a filter click causes
+     (updateReveal() runs once, synchronously, rather than across many
+     scroll frames) into a smooth settle instead of a hard cut. */
+  transition: box-shadow 0.35s ease, opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -381,12 +477,17 @@
   }
 }
 
-.gallery-lightbox-frame video {
+.gallery-lightbox-frame video,
+.gallery-lightbox-frame img {
   width: 100%;
   max-height: calc(88vh - 3.5rem);
   border-radius: 14px;
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
   background: #000;
+}
+
+.gallery-lightbox-frame img {
+  object-fit: contain;
 }
 
 .gallery-lightbox-caption {

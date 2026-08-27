@@ -1,42 +1,46 @@
 import { useEffect, useRef, useState } from 'react'
-import villaCard1 from '../assets/villa-card-1.jpg'
-import villaCard2 from '../assets/villa-card-2.jpg'
-import villaCard3 from '../assets/villa-card-3.jpg'
+import villaCard1 from '../assets/city01-v2.jpg'
+import villaCard2 from '../assets/2cityvilla.jpg'
+import villaCard3 from '../assets/3villa.jpg'
 import villaBrochure1 from '../assets/vila-1.pdf'
 import villaBrochure2 from '../assets/vila-2.pdf'
 import villaBrochure3 from '../assets/villa-3.pdf'
 import EnquiryModal from './EnquiryModal'
 import './VillasSection.css'
 
+// Display order (left → right) is City Villa 2, then City Villa 1, then
+// City Villa 3 — `id` below is the card's position badge, not the villa's
+// own number, so it stays sequential (01/02/03) left to right regardless
+// of which villa sits in which slot.
 const villas = [
   {
     id: '01',
-    name: 'City Villa 1',
-    status: 'completed',
-    statusLabel: 'Completed',
-    detail: 'Move-in ready',
-    beds: 4,
-    baths: 5,
-    area: '3,800 sq.ft',
-    image: villaCard1,
-    cta: 'Explore Villa',
-    brochure: villaBrochure1,
-    brochureName: 'vila-1.pdf',
-  },
-  {
-    id: '02',
     name: 'City Villa 2',
     status: 'ongoing',
     statusLabel: 'Ongoing',
     detail: '65% complete',
     progress: 65,
-    beds: 4,
-    baths: 5,
-    area: '4,200 sq.ft',
+    beds: '4 + 1',
+    baths: 9,
+    area: '6,540 sq.ft',
     image: villaCard2,
     cta: 'View Progress',
     brochure: villaBrochure2,
     brochureName: 'vila-2.pdf',
+  },
+  {
+    id: '02',
+    name: 'City Villa 1',
+    status: 'completed',
+    statusLabel: 'Completed',
+    detail: 'Move-in ready',
+    beds: 3,
+    baths: 7,
+    area: '5,837 sq.ft',
+    image: villaCard1,
+    cta: 'Explore Villa',
+    brochure: villaBrochure1,
+    brochureName: 'vila-1.pdf',
   },
   {
     id: '03',

@@ -33,3 +33,10 @@ src/assets/image01.png
 src/assets/about-villa.jpg
 src/assets/about-detail.jpg
 src/assets/about-accent.jpg
+
+# Raw, un-optimized source photos/renders/floor plans (100s of MB) — the
+# processed, web-sized copies actually used live in src/assets/.
+City villas 1
+City villas 2
+City Villas 3
+Interior

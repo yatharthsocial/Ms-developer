@@ -46,28 +46,25 @@
   margin: 0;
 }
 
+/* Three equal columns rather than one card spanning two grid rows next
+   to a stacked pair: every villa render we have (and every one likely
+   to be added later) is shot in the same tall ~4:5 portrait, so forcing
+   one of them into a slot sized to match two stacked cards' combined
+   height only ever worked by aggressively cropping whichever image sat
+   in that slot. Equal columns + a shared aspect-ratio on the media (see
+   .villa-card-media below) means every villa gets the same, minimal
+   crop regardless of which position it's in. Default (stretch)
+   align-items makes every card match the row's tallest card — the
+   ongoing villa's extra progress-bar row would otherwise leave it taller
+   than its neighbors. The media keeps its own aspect-ratio regardless
+   (it never flex-grows), so the stretch only ever adds height to
+   .villa-card-body below, not to the image. */
 .villas-grid {
   max-width: 78rem;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: clamp(1.25rem, 2.5vw, 1.75rem);
-}
-
-.villa-card--completed {
-  grid-column: 1;
-  grid-row: 1 / 3;
-}
-
-.villa-card--ongoing {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.villa-card--upcoming {
-  grid-column: 2;
-  grid-row: 2;
 }
 
 .villa-card {
@@ -103,21 +100,21 @@
   user-select: none;
 }
 
+/* 4:5 matches the actual villa renders (all shot ~0.8 aspect) almost
+   exactly, so object-fit: cover below only ever trims a sliver instead
+   of forcing a crop to fit a container shape the source photo was never
+   composed for. */
 .villa-card-media {
   position: relative;
-  flex: 1;
-  min-height: 12rem;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
-}
-
-.villa-card--completed .villa-card-media {
-  min-height: 20rem;
 }
 
 .villa-card-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
   transition: transform 0.6s ease, filter 0.6s ease;
 }
@@ -198,9 +195,16 @@
   border: 1.5px solid #fff;
 }
 
+/* Flex column with the CTA pushed to the bottom (see .villa-card-link's
+   margin-top: auto) so the ongoing card's extra progress-bar row doesn't
+   leave its "View Progress" link sitting at a different height than the
+   other two cards' links once .villa-card is stretched to match height. */
 .villa-card-body {
   position: relative;
   z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 1.3rem 1.4rem 1.5rem;
 }
 
@@ -273,7 +277,9 @@
 .villa-card-link {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 0.4rem;
+  margin-top: auto;
   font: inherit;
   font-size: 0.8rem;
   font-weight: 600;
@@ -293,20 +299,13 @@
   gap: 0.6rem;
 }
 
-@media (max-width: 860px) {
+/* Three real ~350px-min columns need more room than the old asymmetric
+   two-column layout did, so this switches a bit earlier (at 960px
+   instead of 860px) to the same single stacked column used on phones,
+   rather than squeezing three columns down to where the card bodies
+   start wrapping awkwardly. */
+@media (max-width: 960px) {
   .villas-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: none;
-  }
-
-  .villa-card--completed,
-  .villa-card--ongoing,
-  .villa-card--upcoming {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .villa-card--completed .villa-card-media {
-    min-height: 16rem;
   }
 }
