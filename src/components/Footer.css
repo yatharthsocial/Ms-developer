@@ -153,6 +153,17 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
+.footer-credit-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-credit-link:hover {
+  color: #b5a2c7;
+  text-decoration: underline;
+}
+
 @media (max-width: 720px) {
   .footer-top {
     grid-template-columns: 1fr;

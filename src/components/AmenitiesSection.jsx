@@ -251,6 +251,13 @@ function AmenitiesSection() {
 
       if (pinRef.current) {
         pinRef.current.style.transform = `translateX(${-eased * 100}%)`
+        // A pure position slide with no fade looks fine mid-scroll, but a
+        // scroll that pauses (or is just slow) partway through freezes on
+        // a static frame with text hard-clipped at the viewport edge and
+        // no visual cue anything is mid-transition — reads as broken UI
+        // rather than "still sliding". Fading it out alongside the slide
+        // means a paused frame reads as "fading away" instead.
+        pinRef.current.style.opacity = String(1 - eased)
         pinRef.current.style.pointerEvents = exitProgress > 0.05 ? 'none' : 'auto'
       }
 

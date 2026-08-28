@@ -1,19 +1,21 @@
 import logo from '../assets/logo.jpg'
+import { scrollToSection } from '../utils/scrollToSection'
 import './Footer.css'
 
 const exploreLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'About Us', href: '#about' },
-  { label: 'Villas', href: '#villas' },
-  { label: 'Amenities', href: '#amenities' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', id: 'home' },
+  { label: 'About Us', id: 'about' },
+  { label: 'Villas', id: 'villas' },
+  { label: 'Amenities', id: 'amenities' },
+  { label: 'Gallery', id: 'gallery' },
+  { label: 'Contact', id: 'contact' },
 ]
 
 const socialLinks = [
   {
     label: 'Instagram',
-    href: '#',
+    href: 'https://www.instagram.com/msdevelopersmangalore?igsi=MWdkZGpsMGVqMGI3',
+    external: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="5" />
@@ -71,7 +73,9 @@ function Footer() {
           <ul>
             {exploreLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href}>{link.label}</a>
+                <a href={`#${link.id}`} onClick={(e) => scrollToSection(e, link.id)}>
+                  {link.label}
+                </a>
               </li>
             ))}
           </ul>
@@ -91,7 +95,7 @@ function Footer() {
               <a href="tel:+917676361375">+91 76763 61375</a>
             </li>
             <li>
-              <a href="mailto:hello@msdevelopers.in">hello@msdevelopers.in</a>
+              <a href="mailto:msdevelopersmangalore@gmail.com">msdevelopersmangalore@gmail.com</a>
             </li>
             <li>10:00 AM – 6:00 PM</li>
           </ul>
@@ -100,7 +104,12 @@ function Footer() {
 
       <div className="footer-bottom">
         <p>&copy; {year} MS Developers. All rights reserved.</p>
-        <p>Managed by Yatharth</p>
+        <p>
+          Managed by{' '}
+          <a href="https://www.yatharthsocial.com/" target="_blank" rel="noreferrer" className="footer-credit-link">
+            Yatharth
+          </a>
+        </p>
       </div>
     </footer>
   )

@@ -134,6 +134,30 @@
   box-shadow: 0 10px 24px rgba(22, 19, 26, 0.18);
 }
 
+/* Center-wrapped flex pills read fine with an even count, but 5 items
+   wraps 3-then-2 — that trailing pair sits centered under nothing in
+   particular above it, which is the "misaligned" look. A fixed 2-column
+   grid instead lines every pill up under a real column, and the odd one
+   out (Interior, always last) spans both so it stays centered rather
+   than stranded on one side. */
+@media (max-width: 600px) {
+  .gallery-filters {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gallery-filter-btn {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.76rem;
+    text-align: center;
+  }
+
+  .gallery-filter-btn:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 /* Shown instead of the grid when the active pill's villa has no tagged
    footage yet (City Villa 2/3, Interior) — a plain, quiet notice rather
    than a jarring empty stretch of page right under the pills. */

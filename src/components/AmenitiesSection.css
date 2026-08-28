@@ -276,6 +276,20 @@
     min-height: 14rem;
   }
 
+  /* .amenities-list's own grid row only ever gets whatever's left of
+     .amenities-pin's fixed height after the image's row above it — on a
+     short-enough viewport that's less than what all 4 rows actually
+     need. With the base rule's `justify-content: center` still active,
+     that overflow spilled out equally in both directions: the list's
+     content pushed up past its own container's top edge and directly
+     into the image above it — the "ghost text under the photo" bug.
+     flex-start keeps the overflow going one direction only (down, past
+     the fold), which is a normal, unsurprising kind of cramped rather
+     than nonsense overlap. */
+  .amenities-list {
+    justify-content: flex-start;
+  }
+
   .amenity-row {
     padding: 0.8rem 0.5rem;
   }

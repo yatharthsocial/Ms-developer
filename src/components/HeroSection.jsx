@@ -2,12 +2,27 @@ import { useEffect, useRef, useState } from 'react'
 import heroVideo from '../assets/fixedd.mp4'
 import heroVideoMobile from '../assets/herosections.mp4'
 import logo from '../assets/logo.jpg'
+import { scrollToSection } from '../utils/scrollToSection'
 import './HeroSection.css'
+
+const MOBILE_BREAKPOINT = '(max-width: 767px)'
 
 function HeroSection() {
   const videoRef = useRef(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
+
+  // Picking the clip here instead of via <source media="..."> — Safari
+  // (iOS in particular, and it's gotten worse across recent versions) is
+  // unreliable about re-evaluating a <source>'s media query inside a
+  // <video>, and has been seen falling back to the last/desktop <source>
+  // regardless of actual viewport width. Read once on mount, same as the
+  // rest of the site's mobile checks (AmenitiesSection.jsx,
+  // GallerySection.jsx) — doesn't need to react live to resizing, same
+  // as the media-query version never did either.
+  const [isMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(MOBILE_BREAKPOINT).matches
+  )
 
   useEffect(() => {
     const video = videoRef.current
@@ -33,34 +48,31 @@ function HeroSection() {
       <video
         ref={videoRef}
         className={`hero-video ${isLoaded ? 'is-loaded' : ''}`}
+        src={isMobile ? heroVideoMobile : heroVideo}
         autoPlay
         muted
         playsInline
         preload="auto"
         onCanPlay={() => setIsLoaded(true)}
         onEnded={handleEnded}
-      >
-        {/* Vertically-shot clip for phones — browsers pick the first
-            matching <source>, evaluated once at load, so this doesn't
-            need to react to resizing the way layout CSS does. */}
-        <source media="(max-width: 767px)" src={heroVideoMobile} type="video/mp4" />
-        <source src={heroVideo} type="video/mp4" />
-      </video>
+      />
       <div className="hero-overlay" />
 
       <div className={`hero-content ${showOverlay ? 'is-visible' : ''}`}>
         <nav className="hero-nav">
           <img src={logo} alt="MS Developers" className="hero-nav-logo" />
           <ul className="hero-nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#villas">Projects</a></li>
-            <li><a href="#amenities">Amenities</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-            <li><a href="#contact">Contact Us</a></li>
+            <li><a href="#home" onClick={(e) => scrollToSection(e, 'home')}>Home</a></li>
+            <li><a href="#about" onClick={(e) => scrollToSection(e, 'about')}>About Us</a></li>
+            <li><a href="#villas" onClick={(e) => scrollToSection(e, 'villas')}>Projects</a></li>
+            <li><a href="#amenities" onClick={(e) => scrollToSection(e, 'amenities')}>Amenities</a></li>
+            <li><a href="#gallery" onClick={(e) => scrollToSection(e, 'gallery')}>Gallery</a></li>
+            <li><a href="#contact" onClick={(e) => scrollToSection(e, 'contact')}>Contact Us</a></li>
           </ul>
           <div className="hero-nav-cta">
-            <a href="#contact" className="hero-btn">Get In Touch</a>
+            <a href="#contact" className="hero-btn" onClick={(e) => scrollToSection(e, 'contact')}>
+              Get In Touch
+            </a>
           </div>
         </nav>
 
@@ -90,7 +102,9 @@ function HeroSection() {
               <span>Happy Clients</span>
             </li>
           </ul>
-          <a href="#contact" className="hero-btn">Get A Consultation</a>
+          <a href="#contact" className="hero-btn" onClick={(e) => scrollToSection(e, 'contact')}>
+            Get A Consultation
+          </a>
         </div>
       </div>
     </section>

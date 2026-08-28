@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import villaCard1 from '../assets/city01-v2.jpg'
 import villaCard2 from '../assets/2cityvilla.jpg'
-import villaCard3 from '../assets/3villa.jpg'
+import villaCard3 from '../assets/3city.jpg'
 import villaBrochure1 from '../assets/vila-1.pdf'
 import villaBrochure2 from '../assets/vila-2.pdf'
 import villaBrochure3 from '../assets/villa-3.pdf'
@@ -48,9 +48,9 @@ const villas = [
     status: 'upcoming',
     statusLabel: 'Upcoming',
     detail: 'Launching soon',
-    beds: 5,
-    baths: 6,
-    area: '4,600 sq.ft',
+    beds: '4 + 1',
+    baths: 9,
+    area: '5,915 sq.ft',
     image: villaCard3,
     cta: 'Register Interest',
     brochure: villaBrochure3,
