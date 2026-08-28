@@ -218,13 +218,36 @@ function AmenitiesSection() {
 
     const updateProgress = () => {
       const rect = pinContainer.getBoundingClientRect()
-      const viewportHeight = window.innerHeight
-      const vhPx = viewportHeight / 100
       const scrolled = -rect.top
+
+      // pinContainer's own height is `calc(${totalDwellVh}vh + 100svh)` —
+      // a mix of plain vh (the dwell) and svh (the trailing release
+      // runway, matched to .amenities-pin's own rendered height so the
+      // sticky pin releases at exactly the right scroll position; see
+      // the comment on that inline style in the JSX below). Rather than
+      // reconstructing "1vh in px" from window.innerHeight — which on
+      // iOS Safari reflects the LARGE viewport and can drift from
+      // whatever vh/svh actually resolved to in the live layout,
+      // especially over a scroll gesture this long (~193vh of dwell) —
+      // this derives it from the two *rendered* heights directly:
+      // container height minus the pin's own (real, svh-based) height
+      // is exactly the dwell portion in real px, whatever vh actually
+      // meant on this device. That real px value is what every vh
+      // threshold below (vhPerAmenity, settleVh, slideVh) is measured
+      // against, so it can't drift out of sync with the pin's actual
+      // sticky-release point the way a window.innerHeight-derived ratio
+      // could — which was leaving Lounge's exit fade/slide finishing
+      // "late": still mid-transition when the pin (a real, browser-
+      // driven position:sticky release, unaffected by any JS drift)
+      // unstuck and Gallery took over underneath it — the "Lounge is
+      // cut" symptom.
+      const releaseRunwayPx = pinRef.current?.getBoundingClientRect().height || window.innerHeight
+      const dwellPx = rect.height - releaseRunwayPx
+      const pxPerVh = dwellPx / totalDwellVh
 
       const nextIndex = Math.min(
         lastIndex,
-        Math.max(0, Math.floor(scrolled / vhPx / vhPerAmenity))
+        Math.max(0, Math.floor(scrolled / pxPerVh / vhPerAmenity))
       )
 
       if (!hoveringRef.current && nextIndex !== activeIndexRef.current) {
@@ -241,7 +264,7 @@ function AmenitiesSection() {
       // still fully pinned, zero vertical motion — spends SLIDE_VH sliding
       // the whole panel out to the left, finishing right as it unpins.
       let exitProgress = 0
-      const scrolledVh = scrolled / vhPx
+      const scrolledVh = scrolled / pxPerVh
       if (nextIndex === lastIndex) {
         const localVh = scrolledVh - regularTotalVh
         exitProgress = Math.min(Math.max((localVh - settleVh) / slideVh, 0), 1)

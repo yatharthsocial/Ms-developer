@@ -163,6 +163,16 @@
   flex-direction: column;
   justify-content: center;
   min-height: 0;
+  /* Grid items default to min-width: auto along the grid's inline axis,
+     same underlying rule as flex items' min-width: auto — as a grid
+     item of .amenities-layout, this refused to shrink below its own
+     content's intrinsic width. On mobile portrait that content is (via
+     .amenity-row-text's single unwrapped, ellipsis-truncated line) the
+     full unwrapped sentence of whichever description is longest, so the
+     list — and the whole row — was rendering wider than the single 1fr
+     column actually available, silently overflowing the page
+     horizontally instead of ever truncating. */
+  min-width: 0;
 }
 
 .amenity-row-wrapper {
@@ -246,6 +256,20 @@
   }
 }
 
+/* Flex items default to min-width: auto, meaning they refuse to shrink
+   below their content's intrinsic width — harmless for the wrapping
+   text used everywhere else, but on mobile portrait's single truncated
+   description line (white-space: nowrap; text-overflow: ellipsis) that
+   intrinsic width is the *entire unwrapped sentence*. Without this, the
+   text column silently grew to fit it, pushing .amenity-row (and the
+   whole page) wider than the viewport instead of ever actually
+   truncating — the ellipsis never had a reason to kick in because
+   nothing was constraining the box smaller than the text in the first
+   place. */
+.amenity-row-text {
+  min-width: 0;
+}
+
 .amenity-row-text h3 {
   font-size: 1rem;
   font-weight: 700;
@@ -267,13 +291,54 @@
    all 4 rows only fits within a TALL narrow portrait screen; on a
    WIDE-but-SHORT landscape one the same stack simply doesn't fit and
    gets clipped instead of growing, which is what was happening here. */
+/* Shrunk from the original desktop-derived sizing so header + image + 4
+   rows actually fit within .amenities-pin's real available height on
+   mobile — the original ~820px of required content was reliably taller
+   than what's really on screen, which is why the 4th row (Lounge) kept
+   ending up below the fold regardless of the overflow-direction fix
+   above. Confirmed against real devices (not just emulated viewports)
+   that there's room for the row descriptions at a smaller size — an
+   earlier pass here hid them outright assuming less headroom than
+   actually exists, which just traded "row cut off" for "large dead gap
+   below the last row". */
 @media (max-width: 900px) and (orientation: portrait) {
+  .amenities-pin {
+    padding: 0.5rem clamp(1.25rem, 5vw, 2.5rem);
+  }
+
+  .amenities-header {
+    margin: 0 auto 0.4rem;
+  }
+
+  .amenities-header h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .amenities-header p {
+    font-size: 0.72rem;
+  }
+
+  /* flex: 1 (from the base rule) means "grow to fill whatever's left of
+     .amenities-pin's fixed 100svh height" — fine on desktop, where the
+     side-by-side layout's own content is tall enough to roughly fill
+     that anyway. Here, now that the image + 4 rows have been shrunk to
+     actually fit a real mobile viewport (see the sizing above), their
+     natural height is well under 100svh, so flex: 1 was stretching this
+     grid container far taller than its own content, leaving a dead gap
+     of empty grid track after the last row rather than distributing
+     that leftover space anywhere. flex: none lets it size to its real
+     content instead; .amenities-pin's own `justify-content: center`
+     (unchanged) then centers that shorter block within the pin, turning
+     one large gap below into two small, even ones above and below. */
   .amenities-layout {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+    flex: none;
   }
 
   .amenities-image-wrapper {
-    min-height: 14rem;
+    min-height: 13rem;
   }
 
   /* .amenities-list's own grid row only ever gets whatever's left of
@@ -285,13 +350,53 @@
      into the image above it — the "ghost text under the photo" bug.
      flex-start keeps the overflow going one direction only (down, past
      the fold), which is a normal, unsurprising kind of cramped rather
-     than nonsense overlap. */
+     than nonsense overlap — but the real fix is the rest of this block
+     making the 4 rows actually fit in the first place. */
   .amenities-list {
     justify-content: flex-start;
   }
 
   .amenity-row {
-    padding: 0.8rem 0.5rem;
+    padding: 0.4rem 0.5rem;
+    gap: 0.7rem;
+  }
+
+  .amenity-row-index {
+    width: 1.5rem;
+    font-size: 0.75rem;
+  }
+
+  .amenity-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .amenity-icon svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .amenity-row-text h3 {
+    font-size: 0.88rem;
+    margin-bottom: 0;
+  }
+
+  /* Hiding this (as the landscape breakpoint below still does) turned
+     out to overcorrect — real devices reported back with a large dead
+     gap below the last row, not a cramped fit, so there was room for it
+     after all. Capped to one truncated line rather than left to wrap
+     freely, though: full 2-line wrapping (the longer descriptions all
+     wrap at this width) adds a much less predictable ~80px across the 4
+     rows, which is fine on a taller phone but overflows a short one
+     (iPhone SE-class, address bar visible) right back into the original
+     "Lounge below the fold" problem — one guaranteed-height line avoids
+     reintroducing that regardless of viewport height. */
+  .amenity-row-text p {
+    font-size: 0.76rem;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
