@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import heroVideo from '../assets/fixedd.mp4'
+import heroVideo from '../assets/videohero.mp4'
 import heroVideoMobile from '../assets/herosections.mp4'
 import logo from '../assets/logo.jpg'
 import { scrollToSection } from '../utils/scrollToSection'
