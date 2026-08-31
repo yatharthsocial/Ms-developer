@@ -34,7 +34,7 @@ const villas = [
     status: 'completed',
     statusLabel: 'Completed',
     detail: 'Move-in ready',
-    beds: 3,
+    beds: '3 + 1',
     baths: 7,
     area: '5,837 sq.ft',
     image: villaCard1,
