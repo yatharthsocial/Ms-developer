@@ -35,7 +35,12 @@ function easeOutCubic(x) {
 // after this pinned stage — first reaches the bottom of the viewport, so
 // the grid's own rise-up (still handled by its own scroll-linked reveal)
 // picks up right as the heading starts leaving.
-const INTRO_DWELL_VH = 68
+//
+// Kept fairly short on purpose: the slide-in still reads clearly, but the
+// hand-off from Amenities scrolling up into Gallery doesn't drag — a
+// longer dwell here made getting from Amenities to the grid feel sluggish
+// on desktop.
+const INTRO_DWELL_VH = 42
 
 // A touch swipe covers far less physical distance per gesture than a
 // trackpad/mouse-wheel scroll — at INTRO_DWELL_VH above (tuned by feel

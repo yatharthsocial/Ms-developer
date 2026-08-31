@@ -1,4 +1,5 @@
 import logo from '../assets/logo.jpg'
+import yatharthLogo from '../assets/logoyatharth.png'
 import { scrollToSection } from '../utils/scrollToSection'
 import './Footer.css'
 
@@ -104,10 +105,10 @@ function Footer() {
 
       <div className="footer-bottom">
         <p>&copy; {year} MS Developers. All rights reserved.</p>
-        <p>
+        <p className="footer-credit">
           Managed by{' '}
           <a href="https://www.yatharthsocial.com/" target="_blank" rel="noreferrer" className="footer-credit-link">
-            Yatharth
+            <img src={yatharthLogo} alt="Yatharth" className="footer-credit-logo" />
           </a>
         </p>
       </div>

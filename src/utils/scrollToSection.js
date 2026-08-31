@@ -11,5 +11,29 @@ export function scrollToSection(event, id) {
   if (!el) return
 
   event.preventDefault()
+
+  // Gallery opens with a tall scroll-pinned intro stage that slides its
+  // heading in from the right over ~1 viewport of scroll, then reveals
+  // the filter pills and grid (see GallerySection.jsx). Landing on the
+  // plain #gallery top drops the visitor onto a blank pre-animation
+  // frame — heading still off-screen, grid still at opacity 0 — and they
+  // have to scroll through the whole dwell before the section shows
+  // anything. For a nav/footer click we want it there immediately, so
+  // skip straight past the intro dwell: land with the heading fully in
+  // and the pills + first row of tiles already on screen.
+  if (id === 'gallery') {
+    const stage = el.querySelector('.gallery-intro-stage')
+    const pin = el.querySelector('.gallery-intro-pin')
+    if (stage && pin) {
+      const stageTop = window.scrollY + stage.getBoundingClientRect().top
+      // stage height is `calc(dwell vh + 100svh)`, pin height is 100svh —
+      // the difference is exactly the dwell distance in real px, whatever
+      // vh resolved to on this device (same trick as AmenitiesSection.jsx).
+      const dwellPx = stage.offsetHeight - pin.offsetHeight
+      window.scrollTo({ top: stageTop + dwellPx + window.innerHeight * 0.55, behavior: 'smooth' })
+      return
+    }
+  }
+
   el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
