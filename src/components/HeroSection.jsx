@@ -7,10 +7,23 @@ import './HeroSection.css'
 
 const MOBILE_BREAKPOINT = '(max-width: 767px)'
 
+const navLinks = [
+  { id: 'home', label: 'Home' },
+  { id: 'about', label: 'About Us' },
+  { id: 'villas', label: 'Projects' },
+  { id: 'amenities', label: 'Amenities' },
+  { id: 'gallery', label: 'Gallery' },
+  { id: 'contact', label: 'Contact Us' },
+]
+
 function HeroSection() {
   const videoRef = useRef(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
+  // Nav links collapse behind a hamburger below 720px, opening as a
+  // full-screen overlay (see HeroSection.css) — this tracks whether it's
+  // open.
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Picking the clip here instead of via <source media="..."> — Safari
   // (iOS in particular, and it's gotten worse across recent versions) is
@@ -43,6 +56,35 @@ function HeroSection() {
     setShowOverlay(true)
   }
 
+  // Shared by every nav link (desktop row and mobile full-screen menu
+  // alike) — scrolls to the section, then closes the menu if it was open
+  // so a tap on mobile doesn't leave it hanging open over the next
+  // section.
+  const handleNavClick = (e, id) => {
+    scrollToSection(e, id)
+    setIsMenuOpen(false)
+  }
+
+  // The full-screen mobile menu behaves like the gallery lightbox
+  // (GallerySection.jsx): Escape closes it, and the page underneath
+  // can't scroll while it's open.
+  useEffect(() => {
+    if (!isMenuOpen) return
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsMenuOpen(false)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [isMenuOpen])
+
   return (
     <section className="hero-section" id="home">
       <video
@@ -61,18 +103,30 @@ function HeroSection() {
       <div className={`hero-content ${showOverlay ? 'is-visible' : ''}`}>
         <nav className="hero-nav">
           <img src={logo} alt="MS Developers" className="hero-nav-logo" />
-          <ul className="hero-nav-links">
-            <li><a href="#home" onClick={(e) => scrollToSection(e, 'home')}>Home</a></li>
-            <li><a href="#about" onClick={(e) => scrollToSection(e, 'about')}>About Us</a></li>
-            <li><a href="#villas" onClick={(e) => scrollToSection(e, 'villas')}>Projects</a></li>
-            <li><a href="#amenities" onClick={(e) => scrollToSection(e, 'amenities')}>Amenities</a></li>
-            <li><a href="#gallery" onClick={(e) => scrollToSection(e, 'gallery')}>Gallery</a></li>
-            <li><a href="#contact" onClick={(e) => scrollToSection(e, 'contact')}>Contact Us</a></li>
+          <ul className={`hero-nav-links ${isMenuOpen ? 'is-open' : ''}`}>
+            {navLinks.map((link) => (
+              <li key={link.id}>
+                <a href={`#${link.id}`} onClick={(e) => handleNavClick(e, link.id)}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
           </ul>
-          <div className="hero-nav-cta">
-            <a href="#contact" className="hero-btn" onClick={(e) => scrollToSection(e, 'contact')}>
+          <div className="hero-nav-actions">
+            <a href="#contact" className="hero-btn hero-nav-cta" onClick={(e) => scrollToSection(e, 'contact')}>
               Get In Touch
             </a>
+            <button
+              type="button"
+              className={`hero-nav-toggle ${isMenuOpen ? 'is-open' : ''}`}
+              onClick={() => setIsMenuOpen((open) => !open)}
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
           </div>
         </nav>
 
@@ -102,8 +156,8 @@ function HeroSection() {
               <span>Happy Clients</span>
             </li>
           </ul>
-          <a href="#contact" className="hero-btn" onClick={(e) => scrollToSection(e, 'contact')}>
-            Get A Consultation
+          <a href="#contact" className="hero-btn hero-stats-cta" onClick={(e) => scrollToSection(e, 'contact')}>
+            Get In Touch
           </a>
         </div>
       </div>
