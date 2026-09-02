@@ -87,13 +87,13 @@ function Footer() {
           <ul>
             <li>Premise No. 206, Second Floor, Marian Paradise Plaza, Bunts Hostel Road, Mangalore DK</li>
             <li>
-              <a href="tel:+919448456279">+91 94484 56279</a>
+              <a href="tel:+919448456279">+91 76763 61375</a>
             </li>
             <li>
               <a href="tel:+918618050684">+91 86180 50684</a>
             </li>
             <li>
-              <a href="tel:+917676361375">+91 76763 61375</a>
+              <a href="tel:+917676361375">+91 94484 56279</a> 
             </li>
             <li>
               <a href="mailto:msdevelopersmangalore@gmail.com">msdevelopersmangalore@gmail.com</a>
