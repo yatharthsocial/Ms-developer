@@ -27,9 +27,9 @@ const infoCards = [
     id: 'phone',
     label: 'Call Us',
     lines: [
-      { text: '+91 94484 56279', href: 'tel:+919448456279' },
-      { text: '+91 86180 50684', href: 'tel:+918618050684' },
       { text: '+91 76763 61375', href: 'tel:+917676361375' },
+      { text: '+91 86180 50684', href: 'tel:+918618050684' },
+      { text: '+91 94484 56279', href: 'tel:+919448456279' },
     ],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
