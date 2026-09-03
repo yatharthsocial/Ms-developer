@@ -72,6 +72,17 @@ function EnquiryModal({ villa, onClose }) {
       const link = document.createElement('a')
       link.href = villa.brochure
       link.download = villa.brochureName || `${villa.name}.pdf`
+      // target="_blank" is the actual point here, not just a nicety: Safari
+      // (recent iOS versions especially) doesn't reliably honor `download`
+      // for PDFs — it opens its own PDF viewer by navigating the CURRENT
+      // tab to the file instead. Without _blank, that navigation aborts
+      // the enquiry fetch() above before it reaches Google, silently
+      // dropping the submission — this is why villa enquiries specifically
+      // (the only form with a brochure download) were going missing on
+      // newer iPhones while the plain contact form, which has no download
+      // step, worked fine.
+      link.target = '_blank'
+      link.rel = 'noopener'
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
